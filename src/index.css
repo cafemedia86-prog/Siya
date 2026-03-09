@@ -1,0 +1,170 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Inter:wght@100..900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Cormorant Garamond", serif;
+  --font-sans: "Inter", sans-serif;
+
+  --color-brand-cream: #f5f5f0;
+  --color-brand-olive: #5A5A40;
+  --color-brand-ink: #1a1a1a;
+  --color-brand-terracotta: #a65d4a;
+  --color-brand-gold: #c9a96e;
+
+  /* Dark mode variants (used via dark: prefix) */
+  --color-dark-bg: #0f0f0f;
+  --color-dark-surface: #1a1a1a;
+  --color-dark-card: #242424;
+  --color-dark-text: #e8e8e3;
+  --color-dark-muted: #9a9a8f;
+}
+
+/* ───────────────────── Base Layer ───────────────────── */
+@layer base {
+  body {
+    @apply bg-brand-cream text-brand-ink font-sans antialiased transition-colors duration-500;
+  }
+
+  .dark body,
+  html.dark body {
+    background-color: var(--color-dark-bg);
+    color: var(--color-dark-text);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+  }
+
+  /* Focus‑visible ring for keyboard accessibility */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-brand-terracotta ring-offset-2;
+  }
+
+  html.dark *:focus-visible {
+    ring-offset-color: var(--color-dark-bg);
+  }
+}
+
+/* ───────────────── Glass Card Utility ───────────────── */
+.glass-card {
+  @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-sm;
+}
+html.dark .glass-card {
+  background: rgba(36,36,36,0.75);
+  border-color: rgba(255,255,255,0.06);
+}
+
+.glass {
+  @apply bg-white/70 backdrop-blur-xl;
+}
+html.dark .glass {
+  background: rgba(36,36,36,0.70);
+}
+
+/* ───────────────── Dark Mode Overrides ───────────────── */
+html.dark .bg-brand-cream   { background-color: var(--color-dark-bg); }
+html.dark .bg-white          { background-color: var(--color-dark-surface); }
+html.dark .bg-white\/50      { background-color: rgba(36,36,36,0.5); }
+html.dark .bg-brand-cream\/50 { background-color: rgba(15,15,15,0.5); }
+html.dark .text-brand-ink    { color: var(--color-dark-text); }
+html.dark .text-brand-ink\/60 { color: var(--color-dark-muted); }
+html.dark .text-brand-ink\/70 { color: var(--color-dark-muted); }
+html.dark .text-brand-ink\/40 { color: rgba(154,154,143,0.6); }
+html.dark .border-brand-cream { border-color: rgba(255,255,255,0.06); }
+html.dark .border-brand-olive\/10 { border-color: rgba(90,90,64,0.2); }
+html.dark .shadow-brand-ink\/5  { --tw-shadow-color: rgba(0,0,0,0.3); }
+html.dark .shadow-brand-ink\/10 { --tw-shadow-color: rgba(0,0,0,0.4); }
+
+html.dark .bg-white.rounded-3xl,
+html.dark .bg-white.p-8,
+html.dark .bg-white.p-10 {
+  background-color: var(--color-dark-card);
+}
+
+html.dark input,
+html.dark textarea,
+html.dark select {
+  background-color: rgba(36,36,36,0.6) !important;
+  color: var(--color-dark-text);
+  border-color: rgba(255,255,255,0.08) !important;
+}
+
+/* ───────────────── Scrollbar Utilities ───────────────── */
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* ───────────────── Nav Link Underline ───────────────── */
+.link-underline {
+  position: relative;
+}
+.link-underline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 0;
+  height: 1.5px;
+  background: currentColor;
+  transition: width 0.3s ease;
+}
+.link-underline:hover::after {
+  width: 100%;
+}
+
+/* ───────────────── Keyframe Animations ───────────────── */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 40s linear infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(var(--float-rotate, 12deg)); }
+  50% { transform: translateY(-18px) rotate(var(--float-rotate, 12deg)); }
+}
+.animate-float {
+  --float-rotate: 12deg;
+  animation: float 6s ease-in-out infinite;
+}
+.animate-float-delayed {
+  --float-rotate: -12deg;
+  animation: float 6s ease-in-out 2s infinite;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in-up {
+  animation: fadeInUp 0.7s ease-out forwards;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* ───────────────── Smooth Scroll ───────────────── */
+html {
+  scroll-behavior: smooth;
+}
