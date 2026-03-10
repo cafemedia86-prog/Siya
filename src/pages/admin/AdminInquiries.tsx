@@ -51,6 +51,37 @@ export const AdminInquiries = () => {
         return new Date(a.date).getTime() - new Date(b.date).getTime();
     });
 
+    const handleExportCSV = () => {
+        const headers = ['ID', 'Date', 'Partner', 'Company', 'Email', 'Country', 'Product/Interest', 'Volume', 'Status', 'Message'];
+        const rows = sortedInquiries.map(inq => [
+            inq.id,
+            inq.date,
+            inq.partner,
+            inq.company,
+            inq.email,
+            inq.country,
+            inq.interest,
+            inq.volume,
+            inq.status,
+            inq.message.replace(/"/g, '""')
+        ]);
+
+        const csvContent = [
+            headers.join(','),
+            ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+        ].join('\n');
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `inquiries_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
     const stats = [
         { label: 'Total Inquiries', value: inquiries.length, icon: MessageSquare, color: 'text-blue-500', bg: 'bg-blue-500/10' },
         { label: 'Pending Action', value: inquiries.filter(i => i.status === 'Pending').length, icon: Clock, color: 'text-amber-500', bg: 'bg-amber-500/10' },
@@ -66,8 +97,11 @@ export const AdminInquiries = () => {
                     <p className="text-sm text-neutral-500 font-medium max-w-2xl leading-relaxed">Manage global exporter queries and partner direct relationships.</p>
                 </div>
                 <div className="flex gap-4">
-                    <button className="px-10 py-5 bg-white border border-neutral-200 rounded-full text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-neutral-50 transition-all duration-300 shadow-sm flex items-center gap-3 text-neutral-900">
-                        <Download size={18} /> Export CSV
+                    <button
+                        onClick={handleExportCSV}
+                        className="px-8 py-4 bg-white border border-neutral-200 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-neutral-50 transition-all duration-300 shadow-sm flex items-center gap-2 text-neutral-900"
+                    >
+                        <Download size={16} /> Export CSV
                     </button>
                     <button className="bg-neutral-900 text-white px-10 py-5 rounded-full text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-black transition-all duration-500 shadow-xl flex items-center gap-3">
                         Mark All Read
@@ -146,47 +180,44 @@ export const AdminInquiries = () => {
                         <motion.div
                             key={inq.id}
                             layout
-                            initial={{ opacity: 0, y: 20 }}
+                            initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.95 }}
-                            transition={{ duration: 0.5 }}
+                            exit={{ opacity: 0, scale: 0.98 }}
+                            transition={{ duration: 0.3 }}
                             onClick={() => setSelectedInquiry(inq)}
-                            className="bg-neutral-50 rounded-[2rem] lg:rounded-[3rem] p-6 lg:p-10 flex flex-col lg:grid lg:grid-cols-12 gap-6 lg:gap-8 items-start lg:items-center border border-neutral-100 transition-all duration-500 cursor-pointer group hover:bg-white hover:shadow-2xl hover:shadow-neutral-100/50"
+                            className="bg-neutral-50 rounded-[1.5rem] lg:rounded-[2rem] p-4 lg:p-5 flex flex-col lg:grid lg:grid-cols-12 gap-4 lg:gap-6 items-start lg:items-center border border-neutral-100 transition-all duration-400 cursor-pointer group hover:bg-white hover:shadow-xl hover:shadow-neutral-100/30"
                         >
                             {/* Partner Profile */}
-                            <div className="w-full lg:col-span-4 flex items-center gap-6 lg:gap-10">
-                                <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-2xl sm:rounded-[2rem] bg-white flex items-center justify-center text-xl sm:text-2xl lg:text-3xl font-serif font-bold text-neutral-900 border-2 lg:border-4 border-neutral-50 shadow-lg group-hover:rotate-2 transition-transform duration-700 shrink-0">
+                            <div className="w-full lg:col-span-4 flex items-center gap-4 lg:gap-5">
+                                <div className="w-12 h-12 lg:w-14 lg:h-14 rounded-xl bg-white flex items-center justify-center text-lg lg:text-xl font-serif font-bold text-neutral-900 border lg:border-2 border-neutral-50 shadow-md group-hover:rotate-1 transition-transform duration-500 shrink-0">
                                     {inq.partner.charAt(0)}
                                 </div>
-                                <div className="space-y-2 lg:space-y-3">
-                                    <h3 className="text-lg sm:text-xl lg:text-2xl font-serif font-medium text-neutral-900 group-hover:text-[#a65d4a] transition-colors line-clamp-1">{inq.partner}</h3>
-                                    <div className="flex flex-col gap-1 lg:gap-2">
-                                        <span className="text-[9px] sm:text-[10px] lg:text-[11px] text-neutral-400 font-bold uppercase tracking-wider flex items-center gap-2 lg:gap-3">
-                                            <Globe size={12} className="text-[#a65d4a]" /> {inq.company} • {inq.country}
-                                        </span>
-                                        <span className="text-[9px] sm:text-[10px] lg:text-[11px] text-neutral-400 font-bold uppercase tracking-wider flex items-center gap-2 lg:gap-3">
-                                            <FileText size={12} /> LEA#{inq.id.slice(0, 8).toUpperCase()}
+                                <div className="space-y-0.5">
+                                    <h3 className="text-base lg:text-lg font-serif font-medium text-neutral-900 group-hover:text-[#a65d4a] transition-colors line-clamp-1">{inq.partner}</h3>
+                                    <div className="flex flex-col gap-0.5">
+                                        <span className="text-[8px] lg:text-[9px] text-neutral-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                                            <Globe size={10} className="text-[#a65d4a]" /> {inq.company} • {inq.country}
                                         </span>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Logistics / Product Details */}
-                            <div className="w-full lg:col-span-3 flex flex-row lg:flex-col gap-3 lg:gap-2 border-t lg:border-none border-neutral-50 pt-4 lg:pt-0">
-                                <div className="flex items-center gap-2 lg:gap-3 px-4 lg:px-5 py-2 lg:py-2.5 rounded-full bg-white text-neutral-500 text-[8px] lg:text-[10px] font-bold uppercase tracking-widest border border-neutral-100 w-fit">
-                                    <Package size={12} className="text-neutral-400" />
-                                    {inq.product}
+                            <div className="w-full lg:col-span-3 flex flex-row lg:flex-row gap-2 border-t lg:border-none border-neutral-100/50 pt-3 lg:pt-0">
+                                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white text-neutral-500 text-[8px] font-bold uppercase tracking-wider border border-neutral-100">
+                                    <Package size={10} className="text-neutral-400" />
+                                    {inq.interest}
                                 </div>
-                                <div className="flex items-center gap-2 lg:gap-3 px-4 lg:px-5 py-2 lg:py-2.5 rounded-full bg-neutral-50 text-neutral-500 text-[8px] lg:text-[10px] font-bold uppercase tracking-widest border border-neutral-100 w-fit">
-                                    <TrendingUp size={12} className="text-[#a65d4a]" />
+                                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neutral-100/50 text-neutral-500 text-[8px] font-bold uppercase tracking-wider border border-neutral-100">
+                                    <TrendingUp size={10} className="text-[#a65d4a]" />
                                     {inq.volume}
                                 </div>
                             </div>
 
                             {/* Status */}
-                            <div className="w-full lg:col-span-2 flex lg:justify-center border-t lg:border-none border-neutral-50 pt-4 lg:pt-0">
+                            <div className="w-full lg:col-span-2 flex lg:justify-center border-t lg:border-none border-neutral-100/50 pt-3 lg:pt-0">
                                 <span className={cn(
-                                    "px-4 lg:px-6 py-2 lg:py-3 rounded-full text-[8px] lg:text-[9px] font-bold uppercase tracking-widest border",
+                                    "px-3 py-1.5 rounded-full text-[8px] font-bold uppercase tracking-widest border",
                                     inq.status === 'Pending' ? "bg-amber-500/10 text-amber-500 border-amber-500/20" :
                                         inq.status === 'Quoted' ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" :
                                             inq.status === 'Closed' ? "bg-neutral-500/10 text-neutral-500 border-neutral-500/20" : "bg-neutral-900/10 text-neutral-900 border-neutral-900/20"
@@ -196,10 +227,10 @@ export const AdminInquiries = () => {
                             </div>
 
                             {/* Operations */}
-                            <div className="w-full lg:col-span-3 flex items-center justify-end gap-3 lg:gap-5 border-t lg:border-none border-neutral-50 pt-6 lg:pt-0">
-                                <div className="relative flex-1 lg:min-w-[140px]" onClick={e => e.stopPropagation()}>
+                            <div className="w-full lg:col-span-3 flex items-center justify-end gap-3 border-t lg:border-none border-neutral-100/50 pt-3 lg:pt-0">
+                                <div className="relative flex-1 lg:min-w-[120px]" onClick={e => e.stopPropagation()}>
                                     <select
-                                        className="w-full bg-neutral-100 border-none rounded-2xl px-5 py-4 text-[9px] font-bold uppercase tracking-widest cursor-pointer outline-none hover:bg-neutral-200 transition-colors text-neutral-900"
+                                        className="w-full bg-neutral-100 border-none rounded-xl px-4 py-3 text-[8px] font-bold uppercase tracking-widest cursor-pointer outline-none hover:bg-neutral-200 transition-colors text-neutral-900"
                                         value={inq.status}
                                         onChange={(e) => updateInquiryStatus(inq.id, e.target.value as any)}
                                     >
@@ -211,9 +242,9 @@ export const AdminInquiries = () => {
                                 </div>
                                 <button
                                     onClick={(e) => { e.stopPropagation(); if (confirm('Remove this inquiry?')) deleteInquiry(inq.id) }}
-                                    className="w-14 h-14 flex items-center justify-center rounded-2xl lg:rounded-[1.5rem] bg-red-50/50 text-red-400 hover:bg-red-500 hover:text-white transition-all duration-300"
+                                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-red-50/50 text-red-400 hover:bg-red-500 hover:text-white transition-all duration-300"
                                 >
-                                    <Trash2 size={20} />
+                                    <Trash2 size={16} />
                                 </button>
                             </div>
                         </motion.div>
@@ -287,7 +318,7 @@ export const AdminInquiries = () => {
                                             </div>
                                             <div>
                                                 <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mb-1">Product Category</p>
-                                                <p className="text-xl font-bold">{selectedInquiry.product}</p>
+                                                <p className="text-xl font-bold">{selectedInquiry.interest}</p>
                                             </div>
                                         </div>
                                         <div className="p-8 bg-neutral-50 rounded-[2.5rem] border border-neutral-100 flex items-center gap-6">
@@ -330,7 +361,7 @@ export const AdminInquiries = () => {
 
                                     <div className="space-y-4">
                                         <a
-                                            href={`mailto:${selectedInquiry.email}?subject=Regarding your inquiry for ${selectedInquiry.product}`}
+                                            href={`mailto:${selectedInquiry.email}?subject=Regarding your inquiry for ${selectedInquiry.interest}`}
                                             className="w-full inline-flex items-center justify-center gap-4 bg-neutral-900 text-white py-6 rounded-3xl text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-black transition-all shadow-2xl group"
                                         >
                                             <Reply size={20} className="group-hover:-translate-x-1 transition-transform" /> Draft Official Reply
