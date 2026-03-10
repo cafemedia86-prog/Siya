@@ -75,7 +75,7 @@ export const PRODUCTS: Product[] = [
     pricePerKg: 42,
     minOrder: 10,
     origin: 'Kerala, India',
-    image: 'https://images.unsplash.com/photo-1599148400620-8e1ff0bf28d8?auto=format&fit=crop&q=90&w=1000',
+    image: 'https://finebuy.co.in/wp-content/uploads/2022/07/Green-Cardamom.webp',
     featured: true,
   },
   {

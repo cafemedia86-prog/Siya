@@ -112,7 +112,7 @@ export const Hero = () => {
           transition={{ duration: 1.5, ease: "easeOut" }}
           className="absolute top-0 right-0 w-72 h-96 rounded-[5rem] overflow-hidden border-[12px] border-white shadow-2xl animate-float"
         >
-          <img src="https://images.unsplash.com/photo-1599148400620-8e1ff0bf28d8?auto=format&fit=crop&q=80&w=600" alt="Aromatic green cardamom pods" className="w-full h-full object-cover" referrerPolicy="no-referrer" loading="lazy" />
+          <img src="https://finebuy.co.in/wp-content/uploads/2022/07/Green-Cardamom.webp" alt="Aromatic green cardamom pods" className="w-full h-full object-cover" referrerPolicy="no-referrer" loading="lazy" />
           <div className="absolute inset-0 bg-brand-olive/10 mix-blend-overlay" />
         </motion.div>
 
