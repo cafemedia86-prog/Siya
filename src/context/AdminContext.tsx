@@ -56,11 +56,11 @@ const INITIAL_COMPANY_INFO: CompanyInfo = {
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
 
 export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [products, setProducts] = useState<Product[]>([]);
-    const [inquiries, setInquiries] = useState<Inquiry[]>([]);
-    const [categories, setCategories] = useState<Category[]>([]); // Initialize as empty, will be fetched
+    const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
+    const [inquiries, setInquiries] = useState<Inquiry[]>(INITIAL_INQUIRIES);
+    const [categories, setCategories] = useState<Category[]>(CATEGORIES);
     const [companyInfo, setCompanyInfo] = useState<CompanyInfo>(INITIAL_COMPANY_INFO);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false); // Start as false to avoid "black screen", we fetch in background
 
     useEffect(() => {
         fetchData();
@@ -68,7 +68,10 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     const fetchData = async () => {
         try {
-            setIsLoading(true);
+            // Only set loading if we actually have no data at all (rare)
+            if (products.length === 0 && inquiries.length === 0) {
+                setIsLoading(true);
+            }
 
             // Fetch Categories
             const { data: categoriesData, error: categoriesError } = await supabase
