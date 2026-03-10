@@ -6,9 +6,12 @@ import { CATEGORIES } from '../constants';
 import { cn } from '../lib/utils';
 import { useLocation } from 'react-router-dom';
 import { useAdmin } from '../context/AdminContext';
+import { useTranslation } from 'react-i18next';
 
 export const ProductsPage = () => {
+  const { t, i18n } = useTranslation();
   const { products, categories, isLoading } = useAdmin();
+  const isRTL = i18n.language === 'ar';
   const [searchQuery, setSearchQuery] = React.useState('');
   const [selectedCategory, setSelectedCategory] = React.useState('all');
   const [sortBy, setSortBy] = React.useState<'trending' | 'price-low' | 'price-high'>('trending');
@@ -36,7 +39,7 @@ export const ProductsPage = () => {
       <div className="pt-40 min-h-screen bg-brand-cream flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-brand-cream border-t-brand-olive rounded-full animate-spin" />
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-olive opacity-40">Loading Premium Catalog...</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-olive opacity-40">{t('catalog.header_tag')}...</p>
         </div>
       </div>
     );
@@ -72,12 +75,12 @@ export const ProductsPage = () => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="max-w-3xl"
+            className={cn("max-w-3xl", isRTL && "text-right mr-auto ml-0")}
           >
-            <span className="text-brand-terracotta font-bold tracking-[0.3em] uppercase text-[10px] mb-4 block">Product Catalog</span>
-            <h1 className="text-5xl md:text-6xl font-serif font-bold mb-6">World-Class Ingredients</h1>
+            <span className="text-brand-terracotta font-bold tracking-[0.3em] uppercase text-[10px] mb-4 block">{t('catalog.header_tag')}</span>
+            <h1 className="text-5xl md:text-6xl font-serif font-bold mb-6">{t('catalog.header_title')}</h1>
             <p className="text-white/70 text-lg mb-8 leading-relaxed">
-              Explore our curated selection of premium spices, teas, and dry fruits. Sourced directly from local farmers and processed with artisanal care.
+              {t('catalog.header_desc')}
             </p>
           </motion.div>
         </div>
@@ -92,13 +95,16 @@ export const ProductsPage = () => {
           <div className="glass-card rounded-2xl p-4 md:p-6 shadow-2xl flex flex-col md:flex-row items-center gap-4">
             {/* Search */}
             <div className="relative flex-1 w-full">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-ink/40" size={18} />
+              <Search className={cn("absolute top-1/2 -translate-y-1/2 text-brand-ink/40", isRTL ? "right-4" : "left-4")} size={18} />
               <input
                 type="text"
-                placeholder="Search premium spices, teas..."
+                placeholder={t('catalog.search_placeholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-brand-cream/50 border-none rounded-xl focus:ring-2 focus:ring-brand-olive outline-none text-sm transition-all"
+                className={cn(
+                  "w-full py-3 bg-brand-cream/50 border-none rounded-xl focus:ring-2 focus:ring-brand-olive outline-none text-sm transition-all",
+                  isRTL ? "pr-12 pl-4" : "pl-12 pr-4"
+                )}
                 aria-label="Search products"
               />
             </div>
@@ -106,16 +112,19 @@ export const ProductsPage = () => {
             {/* Sort Dropdown */}
             <div className="flex items-center gap-4 w-full md:w-auto">
               <div className="relative flex-1 md:w-48">
-                <SlidersHorizontal className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-ink/40" size={16} />
+                <SlidersHorizontal className={cn("absolute top-1/2 -translate-y-1/2 text-brand-ink/40", isRTL ? "right-4" : "left-4")} size={16} />
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as any)}
-                  className="w-full pl-12 pr-4 py-3 bg-brand-cream/50 border-none rounded-xl focus:ring-2 focus:ring-brand-olive outline-none text-sm transition-all appearance-none"
+                  className={cn(
+                    "w-full py-3 bg-brand-cream/50 border-none rounded-xl focus:ring-2 focus:ring-brand-olive outline-none text-sm transition-all appearance-none",
+                    isRTL ? "pr-12 pl-4" : "pl-12 pr-4"
+                  )}
                   aria-label="Sort products"
                 >
-                  <option value="trending">Trending</option>
-                  <option value="price-low">Price: Low to High</option>
-                  <option value="price-high">Price: High to Low</option>
+                  <option value="trending">{t('catalog.sorting')} : {t('catalog.sort_trending')}</option>
+                  <option value="price-low">{t('catalog.sorting')} : {t('catalog.sort_low')}</option>
+                  <option value="price-high">{t('catalog.sorting')} : {t('catalog.sort_high')}</option>
                 </select>
               </div>
             </div>
@@ -129,28 +138,30 @@ export const ProductsPage = () => {
           {/* Categories Sidebar */}
           <aside className="w-full lg:w-64 space-y-8">
             <div>
-              <h3 className="text-[10px] font-bold uppercase tracking-widest text-brand-ink/40 mb-6 flex items-center gap-2">
+              <h3 className={cn("text-[10px] font-bold uppercase tracking-widest text-brand-ink/40 mb-6 flex items-center gap-2", isRTL && "flex-row-reverse")}>
                 <Filter size={14} />
-                Categories
+                {t('catalog.categories')}
               </h3>
               <div className="space-y-2">
                 <button
                   onClick={() => setSelectedCategory('all')}
                   className={cn(
-                    "w-full text-left px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all",
+                    "w-full px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all",
+                    isRTL ? "text-right" : "text-left",
                     selectedCategory === 'all'
                       ? "bg-brand-olive text-white shadow-lg shadow-brand-olive/20"
                       : "text-brand-ink/60 hover:bg-white hover:text-brand-olive"
                   )}
                 >
-                  All Products
+                  {t('catalog.all_products')}
                 </button>
                 {categories.map((cat) => (
                   <button
                     key={cat.id}
                     onClick={() => setSelectedCategory(cat.slug)}
                     className={cn(
-                      "w-full text-left px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all",
+                      "w-full px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all",
+                      isRTL ? "text-right" : "text-left",
                       selectedCategory === cat.slug
                         ? "bg-brand-olive text-white shadow-lg shadow-brand-olive/20"
                         : "text-brand-ink/60 hover:bg-white hover:text-brand-olive"
@@ -165,7 +176,7 @@ export const ProductsPage = () => {
             {/* Advanced Filters */}
             {(selectedCategory === 'spices' || selectedCategory === 'all') && (
               <div className="space-y-4">
-                <h3 className="text-[10px] font-bold uppercase tracking-widest text-brand-ink/40 mb-3 ml-2">Pungency Level</h3>
+                <h3 className={cn("text-[10px] font-bold uppercase tracking-widest text-brand-ink/40 mb-3 ml-2", isRTL && "mr-2 ml-0 text-right font-black")}>{t('catalog.pungency')}</h3>
                 <div className="grid grid-cols-2 gap-2">
                   {['all', 'Mild', 'Medium', 'Hot', 'Extra Hot'].map((p) => (
                     <button
@@ -178,7 +189,7 @@ export const ProductsPage = () => {
                           : "border-brand-cream text-brand-ink/40 hover:border-brand-ink/20"
                       )}
                     >
-                      {p === 'all' ? 'All Heat' : p}
+                      {p === 'all' ? t('catalog.all_heat') : p}
                     </button>
                   ))}
                 </div>
@@ -187,7 +198,7 @@ export const ProductsPage = () => {
 
             {(selectedCategory === 'teas' || selectedCategory === 'dry-fruits' || selectedCategory === 'all') && (
               <div className="space-y-4">
-                <h3 className="text-[10px] font-bold uppercase tracking-widest text-brand-ink/40 mb-3 ml-2">Export Grade</h3>
+                <h3 className={cn("text-[10px] font-bold uppercase tracking-widest text-brand-ink/40 mb-3 ml-2", isRTL && "mr-2 ml-0 text-right font-black")}>{t('catalog.grade')}</h3>
                 <div className="flex flex-wrap gap-2">
                   {['all', 'W240', 'W320', 'CTC', 'Extra Bold'].map((g) => (
                     <button
@@ -200,7 +211,7 @@ export const ProductsPage = () => {
                           : "border-brand-cream text-brand-ink/40 hover:border-brand-ink/20"
                       )}
                     >
-                      {g === 'all' ? 'All Grades' : g}
+                      {g === 'all' ? t('catalog.all_grades') : g}
                     </button>
                   ))}
                 </div>
@@ -210,12 +221,12 @@ export const ProductsPage = () => {
             {/* Special Offer Card */}
             <div className="bg-brand-terracotta rounded-[2rem] p-8 text-white relative overflow-hidden group">
               <div className="relative z-10">
-                <h4 className="text-xl font-serif font-bold mb-2">Bulk Pricing</h4>
-                <p className="text-xs text-white/80 mb-6 leading-relaxed">
-                  Unlock exclusive wholesale rates for orders above 500kg.
+                <h4 className={cn("text-xl font-serif font-bold mb-2", isRTL && "text-right")}>{t('catalog.bulk_card_title')}</h4>
+                <p className={cn("text-xs text-white/80 mb-6 leading-relaxed", isRTL && "text-right")}>
+                  {t('catalog.bulk_card_desc')}
                 </p>
-                <button className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest group-hover:translate-x-1 transition-transform">
-                  Learn More <ArrowRight size={14} />
+                <button className={cn("flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest group-hover:translate-x-1 transition-transform", isRTL && "flex-row-reverse mr-auto ml-0")}>
+                  {t('catalog.learn_more')} {isRTL ? <ArrowRight className="rotate-180" size={14} /> : <ArrowRight size={14} />}
                 </button>
               </div>
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl" />
@@ -225,8 +236,8 @@ export const ProductsPage = () => {
           {/* Product Grid */}
           <div className="flex-1">
             <div className="flex justify-between items-center mb-8 border-b border-brand-cream pb-4">
-              <h2 className="text-sm font-bold uppercase tracking-widest text-brand-ink/40">
-                Showing {filteredProducts.length} {filteredProducts.length === 1 ? 'product' : 'products'}
+              <h2 className={cn("text-sm font-bold uppercase tracking-widest text-brand-ink/40", isRTL && "w-full text-right")}>
+                {t('catalog.showing')} {filteredProducts.length} {filteredProducts.length === 1 ? t('catalog.product') : t('catalog.products')}
               </h2>
             </div>
 
@@ -245,8 +256,8 @@ export const ProductsPage = () => {
                 className="text-center py-32 glass-card rounded-[3rem]"
               >
                 <Search size={48} className="mx-auto text-brand-ink/10 mb-6" strokeWidth={1} />
-                <h3 className="text-2xl font-serif font-bold mb-2">No products found</h3>
-                <p className="text-brand-ink/60 text-sm">Try adjusting your search or filters to find what you're looking for.</p>
+                <h3 className="text-2xl font-serif font-bold mb-2">{t('catalog.no_products')}</h3>
+                <p className="text-brand-ink/60 text-sm">{t('catalog.no_products_desc')}</p>
                 <button
                   onClick={() => {
                     setSearchQuery('');
@@ -255,7 +266,7 @@ export const ProductsPage = () => {
                   }}
                   className="mt-8 text-brand-terracotta font-bold uppercase tracking-widest text-[10px] hover:underline"
                 >
-                  Clear all filters
+                  {t('catalog.clear_filters')}
                 </button>
               </motion.div>
             )}

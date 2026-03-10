@@ -1,0 +1,92 @@
+{
+    "nav": {
+        "home": "Inicio",
+        "products": "Productos",
+        "wholesale": "Al por mayor",
+        "about": "Nosotros",
+        "contact": "Contacto",
+        "b2b_inquiry": "Consulta B2B"
+    },
+    "home": {
+        "hero_tag": "Directo de Granjas Indias",
+        "hero_title": "El Estándar de Oro de las Especias Orgánicas.",
+        "hero_desc": "Cerrando la brecha entre los agricultores artesanales indios y los mercados globales. Suministramos especias, tés y frutos secos de primera calidad y de origen ético a industrias de todo el mundo.",
+        "cta_explore": "Explorar Colección",
+        "cta_wholesale": "Consulta Mayorista",
+        "metrics_years": "Años de Herencia",
+        "metrics_global": "Regiones Globales",
+        "trust": {
+            "ethical": "Origen Ético",
+            "premium": "Calidad Premium",
+            "shipping": "Envío Global",
+            "origin": "Directo del Origen"
+        },
+        "values": {
+            "quality": "Calidad Certificada",
+            "quality_desc": "Cada lote se somete a rigurosas pruebas de calidad para cumplir con los estándares internacionales de seguridad alimentaria.",
+            "supply": "Suministro Confiable",
+            "supply_desc": "La gestión constante del inventario garantiza que su negocio nunca se quede sin ingredientes esenciales.",
+            "custom": "Mezclas Personalizadas",
+            "custom_desc": "Mezclas de especias y tés a medida desarrolladas por nuestros expertos para los requisitos únicos de su marca."
+        }
+    },
+    "wholesale": {
+        "title": "Socio en la fuente.",
+        "subtitle": "Pedidos al por mayor y exportación",
+        "description": "Gestionamos todo el proceso de exportación, documentación y control de calidad. Complete nuestro formulario para obtener precios mayoristas personalizados.",
+        "benefits": {
+            "logistics": "Logística optimizada",
+            "logistics_desc": "Envío con despacho de aduana a más de 40 puertos globales.",
+            "pricing": "Precios escalonados",
+            "pricing_desc": "Descuentos por volumen a partir de pedidos de 100 kg.",
+            "quality": "Garantía de calidad",
+            "quality_desc": "Certificados SGS/Intertek disponibles bajo pedido."
+        },
+        "form": {
+            "step1": "Perfil Comercial",
+            "step2": "Requisitos",
+            "step3": "Detalles",
+            "name": "Su nombre",
+            "company": "Nombre de empresa",
+            "email": "Correo electrónico de negocios",
+            "country": "País de operación",
+            "interest": "Interés principal",
+            "volume": "Volumen mensual estimado",
+            "requirements": "Requisitos específicos",
+            "placeholder_msg": "Cuéntenos sus requerimientos...",
+            "submit": "Enviar consulta",
+            "continue": "Continuar",
+            "back": "Atrás",
+            "success_title": "Consulta recibida",
+            "success_msg": "Gracias por su interés. Nuestro gerente lo contactará en 24 horas hábiles."
+        }
+    },
+    "catalog": {
+        "header_tag": "Catálogo de Productos",
+        "header_title": "Ingredientes de Clase Mundial",
+        "header_desc": "Explore nuestra selección de especias, tés y frutos secos de primera calidad. Suministrado directamente de agricultores locales y procesado con cuidado artesanal.",
+        "search_placeholder": "Buscar especias premium, tés...",
+        "sorting": "Ordenar por",
+        "sort_trending": "Tendencias",
+        "sort_low": "Precio: de menor a mayor",
+        "sort_high": "Precio: de mayor a menor",
+        "categories": "Categorías",
+        "all_products": "Todos los Productos",
+        "all_heat": "Toda la temperatura",
+        "all_grades": "Todos los grados",
+        "pungency": "Nivel de picante",
+        "grade": "Grado de exportación",
+        "clear_filters": "Borrar todos los filtros",
+        "no_products": "No se encontraron productos",
+        "no_products_desc": "Intente ajustar su búsqueda o filtros para encontrar lo que busca.",
+        "showing": "Mostrando",
+        "product": "producto",
+        "products": "productos",
+        "add_to_quote": "Añadir a presupuesto",
+        "direct_inquiry": "Consulta directa",
+        "in_basket": "En la canasta",
+        "bulk_card_title": "Precios por Volumen",
+        "bulk_card_desc": "Desbloquee tarifas mayoristas exclusivas para pedidos superiores a 500 kg.",
+        "learn_more": "Más información"
+    }
+}

@@ -4,13 +4,17 @@ import { Send, CheckCircle2, Building2, Package, Mail, User, Info, MapPin, Trash
 import { cn } from '../lib/utils';
 import { useAdmin } from '../context/AdminContext';
 import { useCart } from '../context/CartContext';
+import { useTranslation } from 'react-i18next';
 
 export const WholesaleInquiry = () => {
+  const { t, i18n } = useTranslation();
   const { addInquiry } = useAdmin();
   const { items, removeFromCart, clearCart } = useCart();
   const [step, setStep] = React.useState(1);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [isSuccess, setIsSuccess] = React.useState(false);
+
+  const isRTL = i18n.language === 'ar';
 
   const [formData, setFormData] = React.useState({
     name: '',
@@ -53,9 +57,9 @@ export const WholesaleInquiry = () => {
   };
 
   const steps = [
-    { title: 'Business Profile', icon: Building2 },
-    { title: 'Requirements', icon: Package },
-    { title: 'Details', icon: Mail },
+    { title: t('wholesale.form.step1'), icon: Building2 },
+    { title: t('wholesale.form.step2'), icon: Package },
+    { title: t('wholesale.form.step3'), icon: Mail },
   ];
 
   if (isSuccess) {
@@ -69,9 +73,9 @@ export const WholesaleInquiry = () => {
           <div className="w-20 h-20 bg-brand-olive rounded-full flex items-center justify-center mx-auto mb-8 text-white scale-125">
             <CheckCircle2 size={40} />
           </div>
-          <h2 className="text-4xl font-serif font-bold mb-4">Inquiry Received</h2>
+          <h2 className="text-4xl font-serif font-bold mb-4">{t('wholesale.form.success_title')}</h2>
           <p className="text-brand-ink/60 mb-8 leading-relaxed">
-            Thank you for your interest in Siya's wholesale program. Our B2B partnership manager will review your profile and contact you within 24 business hours.
+            {t('wholesale.form.success_msg')}
           </p>
           <button
             onClick={() => setIsSuccess(false)}
@@ -94,23 +98,23 @@ export const WholesaleInquiry = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
           <div className="space-y-10">
             <motion.div
-              initial={{ opacity: 0, x: -30 }}
+              initial={{ opacity: 0, x: isRTL ? 30 : -30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
             >
-              <span className="text-brand-terracotta font-bold tracking-[0.3em] uppercase text-[10px] mb-4 block">Bulk Orders & Export</span>
-              <h2 className="text-5xl md:text-6xl font-serif font-bold leading-tight mb-6">Partner with the source.</h2>
+              <span className="text-brand-terracotta font-bold tracking-[0.3em] uppercase text-[10px] mb-4 block">{t('wholesale.subtitle')}</span>
+              <h2 className="text-5xl md:text-6xl font-serif font-bold leading-tight mb-6">{t('wholesale.title')}</h2>
               <p className="text-brand-ink/60 text-lg leading-relaxed max-w-md">
-                We handle the end-to-end export process, documentation, and quality assurance. Fill out our tiered inquiry form for custom wholesale pricing.
+                {t('wholesale.description')}
               </p>
             </motion.div>
 
             <div className="space-y-6">
               {[
-                { title: 'Streamlined Logistics', desc: 'Customs-cleared shipping to over 40 global ports.' },
-                { title: 'Tiered Pricing', desc: 'Volume-based discounts starting from 100kg orders.' },
-                { title: 'Quality Assurance', desc: 'SGS/Intertek certification available upon request.' },
+                { title: t('wholesale.benefits.logistics'), desc: t('wholesale.benefits.logistics_desc') },
+                { title: t('wholesale.benefits.pricing'), desc: t('wholesale.benefits.pricing_desc') },
+                { title: t('wholesale.benefits.quality'), desc: t('wholesale.benefits.quality_desc') },
               ].map((item, i) => (
                 <motion.div
                   key={item.title}
@@ -121,7 +125,7 @@ export const WholesaleInquiry = () => {
                   className="flex gap-4 group"
                 >
                   <div className="w-1.5 h-12 bg-brand-terracotta/20 rounded-full group-hover:bg-brand-terracotta transition-colors" />
-                  <div>
+                  <div className={isRTL ? "text-right" : "text-left"}>
                     <h4 className="font-bold text-sm mb-1">{item.title}</h4>
                     <p className="text-xs text-brand-ink/40 font-medium">{item.desc}</p>
                   </div>
@@ -168,28 +172,34 @@ export const WholesaleInquiry = () => {
                   >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-1.5">
-                        <label className="text-[9px] font-bold uppercase tracking-widest text-brand-ink/40 ml-2">Your Name</label>
+                        <label className={cn("text-[9px] font-bold uppercase tracking-widest text-brand-ink/40 ml-2", isRTL && "mr-2 ml-0 text-right block")}>{t('wholesale.form.name')}</label>
                         <div className="relative">
-                          <User className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-ink/20" size={16} />
+                          <User className={cn("absolute top-1/2 -translate-y-1/2 text-brand-ink/20", isRTL ? "right-4" : "left-4")} size={16} />
                           <input
                             required
                             type="text"
                             placeholder="John Doe"
-                            className="w-full pl-12 pr-5 py-3.5 bg-brand-cream/50 border-none rounded-2xl focus:ring-2 focus:ring-brand-olive outline-none transition-all text-sm"
+                            className={cn(
+                              "w-full pr-5 py-3.5 bg-brand-cream/50 border-none rounded-2xl focus:ring-2 focus:ring-brand-olive outline-none transition-all text-sm",
+                              isRTL ? "pl-5 pr-12" : "pl-12 pr-5"
+                            )}
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                           />
                         </div>
                       </div>
                       <div className="space-y-1.5">
-                        <label className="text-[9px] font-bold uppercase tracking-widest text-brand-ink/40 ml-2">Company Name</label>
+                        <label className={cn("text-[9px] font-bold uppercase tracking-widest text-brand-ink/40 ml-2", isRTL && "mr-2 ml-0 text-right block")}>{t('wholesale.form.company')}</label>
                         <div className="relative">
-                          <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-ink/20" size={16} />
+                          <Building2 className={cn("absolute top-1/2 -translate-y-1/2 text-brand-ink/20", isRTL ? "right-4" : "left-4")} size={16} />
                           <input
                             required
                             type="text"
                             placeholder="Global Foods Inc."
-                            className="w-full pl-12 pr-5 py-3.5 bg-brand-cream/50 border-none rounded-2xl focus:ring-2 focus:ring-brand-olive outline-none transition-all text-sm"
+                            className={cn(
+                              "w-full pr-5 py-3.5 bg-brand-cream/50 border-none rounded-2xl focus:ring-2 focus:ring-brand-olive outline-none transition-all text-sm",
+                              isRTL ? "pl-5 pr-12" : "pl-12 pr-5"
+                            )}
                             value={formData.company}
                             onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                           />
@@ -197,28 +207,34 @@ export const WholesaleInquiry = () => {
                       </div>
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[9px] font-bold uppercase tracking-widest text-brand-ink/40 ml-2">Business Email</label>
+                      <label className={cn("text-[9px] font-bold uppercase tracking-widest text-brand-ink/40 ml-2", isRTL && "mr-2 ml-0 text-right block")}>{t('wholesale.form.email')}</label>
                       <div className="relative">
-                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-ink/20" size={16} />
+                        <Mail className={cn("absolute top-1/2 -translate-y-1/2 text-brand-ink/20", isRTL ? "right-4" : "left-4")} size={16} />
                         <input
                           required
                           type="email"
                           placeholder="john@globalfoods.com"
-                          className="w-full pl-12 pr-5 py-3.5 bg-brand-cream/50 border-none rounded-2xl focus:ring-2 focus:ring-brand-olive outline-none transition-all text-sm"
+                          className={cn(
+                            "w-full pr-5 py-3.5 bg-brand-cream/50 border-none rounded-2xl focus:ring-2 focus:ring-brand-olive outline-none transition-all text-sm",
+                            isRTL ? "pl-5 pr-12" : "pl-12 pr-5"
+                          )}
                           value={formData.email}
                           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         />
                       </div>
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[9px] font-bold uppercase tracking-widest text-brand-ink/40 ml-2">Operating Country</label>
+                      <label className={cn("text-[9px] font-bold uppercase tracking-widest text-brand-ink/40 ml-2", isRTL && "mr-2 ml-0 text-right block")}>{t('wholesale.form.country')}</label>
                       <div className="relative">
-                        <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-ink/20" size={16} />
+                        <MapPin className={cn("absolute top-1/2 -translate-y-1/2 text-brand-ink/20", isRTL ? "right-4" : "left-4")} size={16} />
                         <input
                           required
                           type="text"
                           placeholder="United Kingdom"
-                          className="w-full pl-12 pr-5 py-3.5 bg-brand-cream/50 border-none rounded-2xl focus:ring-2 focus:ring-brand-olive outline-none transition-all text-sm"
+                          className={cn(
+                            "w-full pr-5 py-3.5 bg-brand-cream/50 border-none rounded-2xl focus:ring-2 focus:ring-brand-olive outline-none transition-all text-sm",
+                            isRTL ? "pl-5 pr-12" : "pl-12 pr-5"
+                          )}
                           value={formData.country}
                           onChange={(e) => setFormData({ ...formData, country: e.target.value })}
                         />
@@ -265,11 +281,14 @@ export const WholesaleInquiry = () => {
                         </div>
                       ) : (
                         <div className="space-y-1.5">
-                          <label className="text-[9px] font-bold uppercase tracking-widest text-brand-ink/40 ml-2">Primary Interest</label>
+                          <label className={cn("text-[9px] font-bold uppercase tracking-widest text-brand-ink/40 ml-2", isRTL && "mr-2 ml-0 text-right block")}>{t('wholesale.form.interest')}</label>
                           <div className="relative">
-                            <ShoppingBasket className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-ink/20" size={16} />
+                            <ShoppingBasket className={cn("absolute top-1/2 -translate-y-1/2 text-brand-ink/20", isRTL ? "right-4" : "left-4")} size={16} />
                             <select
-                              className="w-full pl-12 pr-5 py-3.5 bg-brand-cream/50 border-none rounded-2xl focus:ring-2 focus:ring-brand-olive outline-none transition-all text-sm appearance-none cursor-pointer"
+                              className={cn(
+                                "w-full pr-5 py-3.5 bg-brand-cream/50 border-none rounded-2xl focus:ring-2 focus:ring-brand-olive outline-none transition-all text-sm appearance-none cursor-pointer",
+                                isRTL ? "pl-5 pr-12" : "pl-12 pr-5"
+                              )}
                               value={formData.interest}
                               onChange={(e) => setFormData({ ...formData, interest: e.target.value })}
                             >
@@ -284,7 +303,7 @@ export const WholesaleInquiry = () => {
                       )}
 
                       <div className="space-y-4 pt-2">
-                        <label className="text-[9px] font-bold uppercase tracking-widest text-brand-ink/40 ml-2">Estimated Monthly Volume</label>
+                        <label className={cn("text-[9px] font-bold uppercase tracking-widest text-brand-ink/40 ml-2", isRTL && "mr-2 ml-0 text-right block")}>{t('wholesale.form.volume')}</label>
                         <div className="grid grid-cols-2 gap-3">
                           {['100-500kg', '500kg-2t', '2t-5t', '5t+'].map((v) => (
                             <button
@@ -316,10 +335,10 @@ export const WholesaleInquiry = () => {
                     className="space-y-6"
                   >
                     <div className="space-y-1.5">
-                      <label className="text-[9px] font-bold uppercase tracking-widest text-brand-ink/40 ml-2">Specific Requirements</label>
+                      <label className={cn("text-[9px] font-bold uppercase tracking-widest text-brand-ink/40 ml-2", isRTL && "mr-2 ml-0 text-right block")}>{t('wholesale.form.requirements')}</label>
                       <textarea
                         rows={6}
-                        placeholder="Please tell us about your specific quality requirements, packaging needs, or delivery timelines..."
+                        placeholder={t('wholesale.form.placeholder_msg')}
                         className="w-full px-6 py-4 bg-brand-cream/50 border-none rounded-3xl focus:ring-2 focus:ring-brand-olive outline-none transition-all text-sm leading-relaxed"
                         value={formData.message}
                         onChange={(e) => setFormData({ ...formData, message: e.target.value })}
@@ -342,7 +361,7 @@ export const WholesaleInquiry = () => {
                     onClick={prevStep}
                     className="flex-1 bg-white text-brand-ink py-4 rounded-2xl font-bold uppercase tracking-widest text-[10px] border border-brand-cream hover:bg-brand-cream transition-all shadow-xl shadow-brand-ink/5"
                   >
-                    Back
+                    {t('wholesale.form.back')}
                   </button>
                 )}
                 <button
@@ -362,8 +381,8 @@ export const WholesaleInquiry = () => {
                     />
                   ) : (
                     <>
-                      {step === 3 ? 'Submit Inquiry' : 'Continue'}
-                      <Send size={14} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                      {step === 3 ? t('wholesale.form.submit') : t('wholesale.form.continue')}
+                      <Send size={14} className={cn("transition-transform", isRTL ? "group-hover:-translate-x-1 group-hover:-translate-y-1" : "group-hover:translate-x-1 group-hover:-translate-y-1")} />
                     </>
                   )}
                 </button>

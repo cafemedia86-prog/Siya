@@ -5,26 +5,29 @@ import { FeaturedProducts } from '../components/FeaturedProducts';
 import { WholesaleInquiry } from '../components/WholesaleInquiry';
 import { motion } from 'motion/react';
 import { Shield, Clock, Users } from 'lucide-react';
-
-const valueProps = [
-  {
-    icon: Shield,
-    title: 'Quality Certified',
-    desc: 'Every batch undergoes rigorous quality testing to meet international food safety standards.',
-  },
-  {
-    icon: Clock,
-    title: 'Reliable Supply',
-    desc: 'Consistent inventory management ensures your business never runs out of essential ingredients.',
-  },
-  {
-    icon: Users,
-    title: 'Custom Blending',
-    desc: 'Tailored spice mixes and tea blends developed by our experts for your unique brand requirements.',
-  },
-];
+import { useTranslation } from 'react-i18next';
 
 export const HomePage = () => {
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
+
+  const valueProps = [
+    {
+      icon: Shield,
+      title: t('home.values.quality'),
+      desc: t('home.values.quality_desc'),
+    },
+    {
+      icon: Clock,
+      title: t('home.values.supply'),
+      desc: t('home.values.supply_desc'),
+    },
+    {
+      icon: Users,
+      title: t('home.values.custom'),
+      desc: t('home.values.custom_desc'),
+    },
+  ];
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -39,13 +42,13 @@ export const HomePage = () => {
         <div className="flex whitespace-nowrap animate-marquee">
           {[...Array(10)].map((_, i) => (
             <div key={i} className="flex items-center gap-8 mx-8">
-              <span className="text-sm font-bold uppercase tracking-[0.3em]">Ethically Sourced</span>
+              <span className="text-sm font-bold uppercase tracking-[0.3em]">{t('home.trust.ethical')}</span>
               <div className="w-2 h-2 bg-brand-terracotta rounded-full"></div>
-              <span className="text-sm font-bold uppercase tracking-[0.3em]">Premium Quality</span>
+              <span className="text-sm font-bold uppercase tracking-[0.3em]">{t('home.trust.premium')}</span>
               <div className="w-2 h-2 bg-brand-terracotta rounded-full"></div>
-              <span className="text-sm font-bold uppercase tracking-[0.3em]">Global Shipping</span>
+              <span className="text-sm font-bold uppercase tracking-[0.3em]">{t('home.trust.shipping')}</span>
               <div className="w-2 h-2 bg-brand-terracotta rounded-full"></div>
-              <span className="text-sm font-bold uppercase tracking-[0.3em]">Direct From Origin</span>
+              <span className="text-sm font-bold uppercase tracking-[0.3em]">{t('home.trust.origin')}</span>
               <div className="w-2 h-2 bg-brand-terracotta rounded-full"></div>
             </div>
           ))}

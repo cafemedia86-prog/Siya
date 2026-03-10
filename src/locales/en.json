@@ -1,0 +1,92 @@
+{
+    "nav": {
+        "home": "Home",
+        "products": "Products",
+        "wholesale": "Wholesale",
+        "about": "About",
+        "contact": "Contact",
+        "b2b_inquiry": "B2B Inquiry"
+    },
+    "home": {
+        "hero_tag": "Direct from Indian Farms",
+        "hero_title": "The Gold Standard of Organic Spices.",
+        "hero_desc": "Bridging the gap between artisanal Indian farmers and global markets. We supply premium, ethically sourced spices, teas, and dry fruits to industries across the world.",
+        "cta_explore": "Explore Collection",
+        "cta_wholesale": "Wholesale Inquiry",
+        "metrics_years": "Years of Heritage",
+        "metrics_global": "Global Regions",
+        "trust": {
+            "ethical": "Ethically Sourced",
+            "premium": "Premium Quality",
+            "shipping": "Global Shipping",
+            "origin": "Direct From Origin"
+        },
+        "values": {
+            "quality": "Quality Certified",
+            "quality_desc": "Every batch undergoes rigorous quality testing to meet international food safety standards.",
+            "supply": "Reliable Supply",
+            "supply_desc": "Consistent inventory management ensures your business never runs out of essential ingredients.",
+            "custom": "Custom Blending",
+            "custom_desc": "Tailored spice mixes and tea blends developed by our experts for your unique brand requirements."
+        }
+    },
+    "wholesale": {
+        "title": "Partner with the source.",
+        "subtitle": "Bulk Orders & Export",
+        "description": "We handle the end-to-end export process, documentation, and quality assurance. Fill out our tiered inquiry form for custom wholesale pricing.",
+        "benefits": {
+            "logistics": "Streamlined Logistics",
+            "logistics_desc": "Customs-cleared shipping to over 40 global ports.",
+            "pricing": "Tiered Pricing",
+            "pricing_desc": "Volume-based discounts starting from 100kg orders.",
+            "quality": "Quality Assurance",
+            "quality_desc": "SGS/Intertek certification available upon request."
+        },
+        "form": {
+            "step1": "Business Profile",
+            "step2": "Requirements",
+            "step3": "Details",
+            "name": "Your Name",
+            "company": "Company Name",
+            "email": "Business Email",
+            "country": "Operating Country",
+            "interest": "Primary Interest",
+            "volume": "Estimated Monthly Volume",
+            "requirements": "Specific Requirements",
+            "placeholder_msg": "Tell us about your requirements...",
+            "submit": "Submit Inquiry",
+            "continue": "Continue",
+            "back": "Back",
+            "success_title": "Inquiry Received",
+            "success_msg": "Thank you for your interest. Our manager will contact you within 24 hours."
+        }
+    },
+    "catalog": {
+        "header_tag": "Product Catalog",
+        "header_title": "World-Class Ingredients",
+        "header_desc": "Explore our curated selection of premium spices, teas, and dry fruits. Sourced directly from local farmers and processed with artisanal care.",
+        "search_placeholder": "Search premium spices, teas...",
+        "sorting": "Sort by",
+        "sort_trending": "Trending",
+        "sort_low": "Price: Low to High",
+        "sort_high": "Price: High to Low",
+        "categories": "Categories",
+        "all_products": "All Products",
+        "all_heat": "All Heat",
+        "all_grades": "All Grades",
+        "pungency": "Pungency Level",
+        "grade": "Export Grade",
+        "clear_filters": "Clear all filters",
+        "no_products": "No products found",
+        "no_products_desc": "Try adjusting your search or filters to find what you're looking for.",
+        "showing": "Showing",
+        "product": "product",
+        "products": "products",
+        "add_to_quote": "Add to Quote",
+        "direct_inquiry": "Direct Inquiry",
+        "in_basket": "In Basket",
+        "bulk_card_title": "Bulk Pricing",
+        "bulk_card_desc": "Unlock exclusive wholesale rates for orders above 500kg.",
+        "learn_more": "Learn More"
+    }
+}

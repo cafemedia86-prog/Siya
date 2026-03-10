@@ -7,6 +7,8 @@ import { ThemeToggle } from './ThemeToggle';
 import { CATEGORIES } from '../constants';
 import { useCart } from '../context/CartContext';
 import { useAdmin } from '../context/AdminContext';
+import { useTranslation } from 'react-i18next';
+import { Languages } from 'lucide-react';
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -22,12 +24,21 @@ export const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const { t, i18n } = useTranslation();
+  const [isLangOpen, setIsLangOpen] = React.useState(false);
+
   const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'Products', path: '/products' },
-    { name: 'Wholesale', path: '/wholesale' },
-    { name: 'About', path: '/about' },
-    { name: 'Contact', path: '/contact' },
+    { name: t('nav.home'), path: '/' },
+    { name: t('nav.products'), path: '/products' },
+    { name: t('nav.wholesale'), path: '/wholesale' },
+    { name: t('nav.about'), path: '/about' },
+    { name: t('nav.contact'), path: '/contact' },
+  ];
+
+  const languages = [
+    { code: 'en', label: 'English', icon: '🇬🇧' },
+    { code: 'es', label: 'Español', icon: '🇪🇸' },
+    { code: 'ar', label: 'العربية', icon: '🇦🇪' }
   ];
 
   return (
@@ -55,10 +66,10 @@ export const Navbar = () => {
         </Link>
 
         {/* Desktop Nav */}
-        <div className="hidden md:flex items-center space-x-10">
+        <div className="hidden md:flex items-center gap-8">
           {navLinks.map((link, i) => (
             <div key={link.name} className="relative group/nav">
-              {link.name === 'Products' ? (
+              {link.path === '/products' ? (
                 <div
                   className="flex items-center gap-1 cursor-pointer"
                   onMouseEnter={() => setIsCategoriesOpen(true)}
@@ -119,7 +130,48 @@ export const Navbar = () => {
             </div>
           ))}
 
-          {/* Theme toggle */}
+          {/* Language Switcher */}
+          <div className="relative">
+            <button
+              onClick={() => setIsLangOpen(!isLangOpen)}
+              className="p-2.5 text-brand-ink/60 hover:text-brand-olive transition-colors flex items-center gap-2"
+              aria-label="Change language"
+            >
+              <Languages size={20} />
+              <span className="text-[10px] font-black uppercase tracking-widest">{i18n.language.toUpperCase()}</span>
+            </button>
+
+            <AnimatePresence>
+              {isLangOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  className="absolute top-full right-0 pt-4 w-48"
+                >
+                  <div className="glass rounded-2xl p-2 shadow-2xl border border-white/20">
+                    {languages.map((lang) => (
+                      <button
+                        key={lang.code}
+                        onClick={() => {
+                          i18n.changeLanguage(lang.code);
+                          setIsLangOpen(false);
+                        }}
+                        className={cn(
+                          "w-full text-left px-4 py-3 text-[10px] font-bold uppercase tracking-widest rounded-xl transition-all flex items-center justify-between",
+                          i18n.language === lang.code ? "bg-brand-olive text-white" : "text-brand-ink/60 hover:text-brand-olive hover:bg-brand-cream"
+                        )}
+                      >
+                        <span>{lang.label}</span>
+                        <span>{lang.icon}</span>
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
           <ThemeToggle />
 
           {/* Quote Basket */}
@@ -147,7 +199,7 @@ export const Navbar = () => {
               className="bg-brand-ink text-white px-6 py-2.5 rounded-full text-[11px] font-bold uppercase tracking-widest hover:bg-brand-olive hover:scale-105 transition-all flex items-center gap-2 shadow-xl shadow-brand-ink/10"
             >
               <Phone size={14} />
-              B2B Inquiry
+              {t('nav.b2b_inquiry')}
             </Link>
           </motion.div>
         </div>
@@ -220,7 +272,7 @@ export const Navbar = () => {
                 onClick={() => setIsOpen(false)}
                 className="block w-full text-center bg-brand-ink text-white px-6 py-5 rounded-2xl text-sm font-bold uppercase tracking-widest mt-6 shadow-xl shadow-brand-ink/10"
               >
-                Wholesale Inquiry
+                {t('nav.b2b_inquiry')}
               </Link>
             </div>
           </motion.div>

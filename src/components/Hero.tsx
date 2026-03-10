@@ -3,7 +3,12 @@ import { motion, useScroll, useTransform } from 'motion/react';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+import { useTranslation } from 'react-i18next';
+import { cn } from '../lib/utils';
+
 export const Hero = () => {
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
   const containerRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -24,7 +29,7 @@ export const Hero = () => {
           initial={{ scale: 1.1 }}
           animate={{ scale: 1 }}
           transition={{ duration: 10, ease: "easeOut" }}
-          src="https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&q=80&w=1920"
+          src="https://images.unsplash.com/photo-1590610330386-89689531518e?auto=format&fit=crop&q=80&w=1920"
           alt="Premium Indian spices and seasonings"
           className="w-full h-full object-cover"
           referrerPolicy="no-referrer"
@@ -51,10 +56,13 @@ export const Hero = () => {
                 hidden: { opacity: 0, y: 10 },
                 visible: { opacity: 1, y: 0 }
               }}
-              className="inline-flex items-center gap-3 text-brand-terracotta font-bold tracking-[0.3em] uppercase text-[10px] mb-6 bg-brand-terracotta/10 px-4 py-1.5 rounded-full"
+              className={cn(
+                "inline-flex items-center gap-3 text-brand-terracotta font-bold tracking-[0.3em] uppercase text-[10px] mb-6 bg-brand-terracotta/10 px-4 py-1.5 rounded-full",
+                isRTL && "flex-row-reverse"
+              )}
             >
               <span className="w-1.5 h-1.5 bg-brand-terracotta rounded-full animate-pulse" />
-              Direct From Origin
+              {t('home.hero_tag')}
             </motion.span>
 
             <motion.h1
@@ -62,10 +70,9 @@ export const Hero = () => {
                 hidden: { opacity: 0, y: 30 },
                 visible: { opacity: 1, y: 0 }
               }}
-              className="text-6xl md:text-8xl font-serif font-bold text-brand-ink leading-[0.85] mb-6 tracking-tighter"
+              className={cn("text-6xl md:text-8xl font-serif font-bold text-brand-ink leading-[0.85] mb-6 tracking-tighter", isRTL && "text-right mr-auto ml-0")}
             >
-              The Soul of <br />
-              <span className="italic text-brand-olive font-medium">Authenticity.</span>
+              {t('home.hero_title')}
             </motion.h1>
 
             <motion.p
@@ -73,9 +80,9 @@ export const Hero = () => {
                 hidden: { opacity: 0, y: 20 },
                 visible: { opacity: 1, y: 0 }
               }}
-              className="text-lg text-brand-ink/70 mb-10 max-w-lg leading-relaxed font-medium"
+              className={cn("text-lg text-brand-ink/70 mb-10 max-w-lg leading-relaxed font-medium", isRTL && "text-right mr-auto ml-0")}
             >
-              Sourcing the world's most aromatic spices and artisanal teas for global B2B partners who refuse to compromise on quality.
+              {t('home.hero_desc')}
             </motion.p>
 
             <motion.div
@@ -83,20 +90,20 @@ export const Hero = () => {
                 hidden: { opacity: 0, y: 20 },
                 visible: { opacity: 1, y: 0 }
               }}
-              className="flex flex-wrap gap-6"
+              className={cn("flex flex-wrap gap-6", isRTL && "justify-end")}
             >
               <Link
                 to="/products"
                 className="bg-brand-olive text-white px-10 py-5 rounded-full font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:bg-brand-ink hover:scale-105 transition-all group shadow-2xl shadow-brand-olive/20"
               >
-                Explore Catalog
-                <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
+                {t('home.cta_explore')}
+                <ArrowRight size={18} className={cn("transition-transform", isRTL ? "rotate-180 group-hover:-translate-x-2" : "group-hover:translate-x-2")} />
               </Link>
               <Link
                 to="/wholesale"
                 className="bg-white/50 backdrop-blur-md border border-brand-olive/20 text-brand-olive px-10 py-5 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-white hover:scale-105 transition-all text-center shadow-xl"
               >
-                Wholesale Inquiry
+                {t('home.cta_wholesale')}
               </Link>
             </motion.div>
           </motion.div>

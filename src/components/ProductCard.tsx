@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { Product } from '../types';
 import { useCart } from '../context/CartContext';
 import { cn } from '../lib/utils';
+import { useTranslation } from 'react-i18next';
 
 interface ProductCardProps {
   product: Product;
@@ -12,8 +13,10 @@ interface ProductCardProps {
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
+  const { t, i18n } = useTranslation();
   const { addToCart, items } = useCart();
   const isInCart = items.some(item => item.id === product.id);
+  const isRTL = i18n.language === 'ar';
 
   return (
     <motion.div
@@ -39,7 +42,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
           </div>
         </div>
 
-        <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+        <div className={cn("absolute bottom-4 flex justify-between items-end opacity-0 group-hover:opacity-100 transition-opacity duration-500 gap-2", isRTL ? "right-4 left-4" : "left-4 right-4")}>
           <div className="glass px-2.5 py-1 rounded-lg text-[8px] font-bold text-brand-ink uppercase tracking-widest flex items-center gap-1">
             <MapPin size={10} />
             {product.origin}
@@ -56,11 +59,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
         </p>
 
         <div className="flex items-center justify-between pt-4 border-t border-brand-cream">
-          <div>
+          <div className={cn(isRTL && "text-right")}>
             <span className="block text-[8px] text-brand-ink/40 font-bold uppercase tracking-widest mb-0.5">Wholesale</span>
             <span className="text-lg font-bold text-brand-ink">${product.pricePerKg}<span className="text-[10px] font-medium text-brand-ink/40">/kg</span></span>
           </div>
-          <div className="flex items-center gap-1.5 text-[8px] font-bold text-brand-terracotta bg-brand-terracotta/5 px-2.5 py-1 rounded-full uppercase tracking-widest">
+          <div className={cn("flex items-center gap-1.5 text-[8px] font-bold text-brand-terracotta bg-brand-terracotta/5 px-2.5 py-1 rounded-full uppercase tracking-widest", isRTL && "flex-row-reverse")}>
             <Package size={10} />
             Min. {product.minOrder}kg
           </div>
@@ -79,21 +82,21 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
           >
             {isInCart ? (
               <>
-                <Check size={12} /> In Basket
+                <Check size={12} /> {t('catalog.in_basket')}
               </>
             ) : (
               <>
-                <Plus size={12} /> Add to Quote
+                <Plus size={12} /> {t('catalog.add_to_quote')}
               </>
             )}
           </button>
 
           <Link
             to="/wholesale"
-            className="flex-1 bg-brand-ink text-white py-3 rounded-xl font-bold uppercase tracking-widest text-[8px] hover:bg-brand-olive hover:scale-[1.02] transition-all flex items-center justify-center gap-2 shadow-lg shadow-brand-ink/5 group"
+            className="flex-1 bg-brand-ink text-white py-3 rounded-xl font-bold uppercase tracking-widest text-[8px] hover:bg-brand-olive hover:scale-[1.02] transition-all flex items-center justify-center gap-2 shadow-lg shadow-brand-ink/5 group text-center"
             aria-label={`Direct inquiry for ${product.name}`}
           >
-            Direct Inquiry
+            {t('catalog.direct_inquiry')}
           </Link>
         </div>
       </div>
