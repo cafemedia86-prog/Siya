@@ -88,5 +88,15 @@
         "bulk_card_title": "Precios por Volumen",
         "bulk_card_desc": "Desbloquee tarifas mayoristas exclusivas para pedidos superiores a 500 kg.",
         "learn_more": "Más información"
+    },
+    "logistics": {
+        "efficiency": "Eficiencia Logística",
+        "total_kg": "kg Total",
+        "full": "Lleno",
+        "lcl": "LCL (Parcial)",
+        "fcl": "20ft FCL (Completo)",
+        "optimize_msg": "Su pedido llena el {{percent}}% de un contenedor estándar de 20 pies. Añadir {{remaining}} kg más optimizará el coste de envío por kg.",
+        "congrats_msg": "¡Enhorabuena! Ha optimizado su envío para una carga de contenedor completo (FCL). Se aplicarán las mejores tarifas de flete.",
+        "optimized_reached": "Carga Optimizada Alcanzada"
     }
 }

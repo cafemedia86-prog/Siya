@@ -88,5 +88,15 @@
         "bulk_card_title": "Bulk Pricing",
         "bulk_card_desc": "Unlock exclusive wholesale rates for orders above 500kg.",
         "learn_more": "Learn More"
+    },
+    "logistics": {
+        "efficiency": "Logistics Efficiency",
+        "total_kg": "kg Total",
+        "full": "Full",
+        "lcl": "LCL (Partial)",
+        "fcl": "20ft FCL (Full)",
+        "optimize_msg": "Your order fills {{percent}}% of a standard 20ft container. Adding {{remaining}}kg more will optimize your shipping-per-kg cost.",
+        "congrats_msg": "Congratulations! You have optimized your shipment for a Full Container Load (FCL). Best freight rates will apply.",
+        "optimized_reached": "Optimized Load Reached"
     }
 }

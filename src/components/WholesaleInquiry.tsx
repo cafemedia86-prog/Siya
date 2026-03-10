@@ -5,11 +5,13 @@ import { cn } from '../lib/utils';
 import { useAdmin } from '../context/AdminContext';
 import { useCart } from '../context/CartContext';
 import { useTranslation } from 'react-i18next';
+import { LogisticsEstimator } from './LogisticsEstimator';
+import { Plus, Minus } from 'lucide-react';
 
 export const WholesaleInquiry = () => {
   const { t, i18n } = useTranslation();
   const { addInquiry } = useAdmin();
-  const { items, removeFromCart, clearCart } = useCart();
+  const { items, removeFromCart, clearCart, updateQuantity, totalWeight } = useCart();
   const [step, setStep] = React.useState(1);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [isSuccess, setIsSuccess] = React.useState(false);
@@ -35,7 +37,7 @@ export const WholesaleInquiry = () => {
     setIsSubmitting(true);
 
     const basketDetails = items.length > 0
-      ? `\n\nBasket Items:\n${items.map(item => `- ${item.name} (${item.quantity})`).join('\n')}`
+      ? `\n\nBasket Items:\n${items.map(item => `- ${item.name} (${item.quantity}kg)`).join('\n')}\nTotal Weight: ${totalWeight}kg`
       : '';
 
     // Connect to Admin Context
@@ -264,18 +266,41 @@ export const WholesaleInquiry = () => {
                                   </div>
                                   <div>
                                     <p className="text-[10px] font-bold text-brand-ink">{item.name}</p>
-                                    <p className="text-[8px] text-brand-ink/40 font-bold uppercase tracking-widest leading-none">Min. {item.minOrder}kg</p>
+                                    <div className="flex items-center gap-3 mt-1.5">
+                                      <div className="flex items-center bg-brand-cream/50 rounded-lg p-1 border border-brand-cream hover:border-brand-olive/20 transition-colors">
+                                        <button
+                                          type="button"
+                                          onClick={() => updateQuantity(item.id, Math.max(item.minOrder, item.quantity - 100))}
+                                          className="p-1 hover:bg-white rounded-md transition-colors"
+                                        >
+                                          <Minus size={10} className="text-brand-ink/40" />
+                                        </button>
+                                        <span className="w-12 text-center text-[10px] font-black text-brand-olive">{item.quantity}kg</span>
+                                        <button
+                                          type="button"
+                                          onClick={() => updateQuantity(item.id, item.quantity + 100)}
+                                          className="p-1 hover:bg-white rounded-md transition-colors"
+                                        >
+                                          <Plus size={10} className="text-brand-ink/40" />
+                                        </button>
+                                      </div>
+                                    </div>
                                   </div>
                                 </div>
                                 <button
                                   type="button"
                                   onClick={() => removeFromCart(item.id)}
-                                  className="p-2 text-red-400 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-50 rounded-lg"
+                                  className="p-2 text-red-400 opacity-10 md:opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-50 rounded-lg shrink-0"
                                 >
                                   <Trash2 size={14} />
                                 </button>
                               </div>
                             ))}
+                          </div>
+
+                          {/* Container Estimator */}
+                          <div className="mt-8">
+                            <LogisticsEstimator />
                           </div>
                           <p className="text-[9px] text-brand-ink/40 italic ml-2">These will be included in your custom RFQ.</p>
                         </div>
