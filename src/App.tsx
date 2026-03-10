@@ -42,25 +42,6 @@ export default function App() {
           <ScrollToTop />
           <div className="flex flex-col min-h-screen">
             <Routes>
-              {/* Public Routes */}
-              <Route path="/*" element={
-                <>
-                  <Navbar />
-                  <main className="flex-grow">
-                    <AnimatePresence mode="wait">
-                      <Routes>
-                        <Route path="/" element={<HomePage />} />
-                        <Route path="/products" element={<ProductsPage />} />
-                        <Route path="/wholesale" element={<WholesalePage />} />
-                        <Route path="/about" element={<AboutPage />} />
-                        <Route path="/contact" element={<ContactPage />} />
-                      </Routes>
-                    </AnimatePresence>
-                  </main>
-                  <Footer />
-                </>
-              } />
-
               {/* Admin Login */}
               <Route path="/admin/login" element={<AdminLogin />} />
 
@@ -76,6 +57,26 @@ export default function App() {
                     </Routes>
                   </AdminLayout>
                 </ProtectedRoute>
+              } />
+
+              {/* Public Routes */}
+              <Route path="/*" element={
+                <>
+                  <Navbar />
+                  <main className="flex-grow">
+                    <AnimatePresence mode="wait">
+                      <Routes>
+                        <Route path="/" element={<HomePage />} />
+                        <Route path="/products" element={<ProductsPage />} />
+                        <Route path="/wholesale" element={<WholesalePage />} />
+                        <Route path="/about" element={<AboutPage />} />
+                        <Route path="/contact" element={<ContactPage />} />
+                        {/* 404 handler for public routes if needed */}
+                      </Routes>
+                    </AnimatePresence>
+                  </main>
+                  <Footer />
+                </>
               } />
             </Routes>
           </div>
