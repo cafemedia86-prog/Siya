@@ -1,15 +1,19 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Phone, ChevronDown } from 'lucide-react';
+import { Menu, X, Phone, ChevronDown, ShoppingBasket } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
 import { ThemeToggle } from './ThemeToggle';
 import { CATEGORIES } from '../constants';
+import { useCart } from '../context/CartContext';
+import { useAdmin } from '../context/AdminContext';
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = React.useState(false);
   const [isCategoriesOpen, setIsCategoriesOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
+  const { itemCount } = useCart();
+  const { isLoading } = useAdmin();
   const location = useLocation();
 
   React.useEffect(() => {
@@ -118,10 +122,25 @@ export const Navbar = () => {
           {/* Theme toggle */}
           <ThemeToggle />
 
+          {/* Quote Basket */}
+          <Link
+            to="/wholesale"
+            className="relative p-2.5 text-brand-ink/60 hover:text-brand-olive transition-colors group"
+            aria-label="View Quote Basket"
+          >
+            <ShoppingBasket size={22} className="group-hover:scale-110 transition-transform" />
+            {itemCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-brand-terracotta text-white text-[8px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow-lg transform group-hover:-translate-y-1 transition-transform border-2 border-white">
+                {itemCount}
+              </span>
+            )}
+          </Link>
+
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.4 }}
+            className="flex items-center gap-4"
           >
             <Link
               to="/wholesale"
@@ -134,8 +153,19 @@ export const Navbar = () => {
         </div>
 
         {/* Mobile: toggle + hamburger */}
-        <div className="md:hidden flex items-center gap-3">
+        <div className="md:hidden flex items-center gap-2">
           <ThemeToggle />
+          <Link
+            to="/wholesale"
+            className="relative p-2 text-brand-ink transition-colors"
+          >
+            <ShoppingBasket size={22} />
+            {itemCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-brand-terracotta text-white text-[7px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-md border border-white">
+                {itemCount}
+              </span>
+            )}
+          </Link>
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="text-brand-ink p-2 hover:bg-brand-cream rounded-full transition-colors"

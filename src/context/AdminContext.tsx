@@ -104,7 +104,9 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 minOrder: p.min_order,
                 origin: p.origin,
                 image: p.image,
-                featured: p.featured
+                featured: p.featured,
+                pungency: p.pungency,
+                grade: p.grade
             }));
 
             // Fetch Inquiries
@@ -149,7 +151,9 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 min_order: product.minOrder,
                 origin: product.origin,
                 image: product.image,
-                featured: product.featured
+                featured: product.featured,
+                pungency: (product as any).pungency,
+                grade: (product as any).grade
             }]);
 
             if (error) throw error;
@@ -170,6 +174,8 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             if (updatedFields.origin) dbFields.origin = updatedFields.origin;
             if (updatedFields.image) dbFields.image = updatedFields.image;
             if (updatedFields.featured !== undefined) dbFields.featured = updatedFields.featured;
+            if (updatedFields.pungency) dbFields.pungency = updatedFields.pungency;
+            if (updatedFields.grade) dbFields.grade = updatedFields.grade;
 
             const { error } = await supabase
                 .from('products')

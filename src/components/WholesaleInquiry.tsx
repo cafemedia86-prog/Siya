@@ -1,11 +1,13 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Send, CheckCircle2, Building2, Package, Mail, User, Info, MapPin } from 'lucide-react';
+import { Send, CheckCircle2, Building2, Package, Mail, User, Info, MapPin, Trash2, ShoppingBasket } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useAdmin } from '../context/AdminContext';
+import { useCart } from '../context/CartContext';
 
 export const WholesaleInquiry = () => {
   const { addInquiry } = useAdmin();
+  const { items, removeFromCart, clearCart } = useCart();
   const [step, setStep] = React.useState(1);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [isSuccess, setIsSuccess] = React.useState(false);
@@ -28,21 +30,26 @@ export const WholesaleInquiry = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
+    const basketDetails = items.length > 0
+      ? `\n\nBasket Items:\n${items.map(item => `- ${item.name} (${item.quantity})`).join('\n')}`
+      : '';
+
     // Connect to Admin Context
     addInquiry({
       partner: formData.name,
       company: formData.company,
       email: formData.email,
-      interest: formData.interest,
+      interest: items.length > 0 ? 'Mixed (Basket)' : formData.interest,
       volume: formData.volume,
       country: formData.country || 'Global',
-      message: formData.message || 'Standard wholesale enquiry.'
+      message: (formData.message || 'Standard wholesale enquiry.') + basketDetails
     });
 
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 1500));
     setIsSubmitting(false);
     setIsSuccess(true);
+    clearCart();
   };
 
   const steps = [
@@ -228,38 +235,73 @@ export const WholesaleInquiry = () => {
                     exit={{ opacity: 0, x: -20 }}
                     className="space-y-6"
                   >
-                    <div className="space-y-1.5">
-                      <label className="text-[9px] font-bold uppercase tracking-widest text-brand-ink/40 ml-2">Primary Interest</label>
-                      <select
-                        className="w-full px-5 py-3.5 bg-brand-cream/50 border-none rounded-2xl focus:ring-2 focus:ring-brand-olive outline-none transition-all text-sm appearance-none cursor-pointer"
-                        value={formData.interest}
-                        onChange={(e) => setFormData({ ...formData, interest: e.target.value })}
-                      >
-                        <option value="spices">Premium Spices</option>
-                        <option value="dry-fruits">Bulk Dry Fruits</option>
-                        <option value="teas">Artisanal Teas</option>
-                        <option value="herbal-teas">Herbal & Wellness Teas</option>
-                        <option value="multiple">Multiple Categories</option>
-                      </select>
-                    </div>
-                    <div className="space-y-4">
-                      <label className="text-[9px] font-bold uppercase tracking-widest text-brand-ink/40 ml-2">Estimated Monthly Volume</label>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {['100-500kg', '500kg-2 tons', '2-5 tons', '5 tons+'].map((v) => (
-                          <button
-                            key={v}
-                            type="button"
-                            onClick={() => setFormData({ ...formData, volume: v })}
-                            className={cn(
-                              "px-4 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest border transition-all",
-                              formData.volume === v
-                                ? "bg-brand-olive border-brand-olive text-white shadow-lg shadow-brand-olive/20"
-                                : "border-brand-cream text-brand-ink/60 hover:border-brand-olive hover:text-brand-olive bg-white/50"
-                            )}
-                          >
-                            {v}
-                          </button>
-                        ))}
+                    <div className="space-y-6">
+                      {items.length > 0 ? (
+                        <div className="space-y-4">
+                          <label className="text-[9px] font-bold uppercase tracking-widest text-brand-ink/40 ml-2">Quote Basket ({items.length})</label>
+                          <div className="space-y-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
+                            {items.map((item) => (
+                              <div key={item.id} className="flex items-center justify-between p-3 bg-white/50 rounded-xl border border-brand-cream/50 group">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0">
+                                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                                  </div>
+                                  <div>
+                                    <p className="text-[10px] font-bold text-brand-ink">{item.name}</p>
+                                    <p className="text-[8px] text-brand-ink/40 font-bold uppercase tracking-widest leading-none">Min. {item.minOrder}kg</p>
+                                  </div>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => removeFromCart(item.id)}
+                                  className="p-2 text-red-400 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-50 rounded-lg"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                          <p className="text-[9px] text-brand-ink/40 italic ml-2">These will be included in your custom RFQ.</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-1.5">
+                          <label className="text-[9px] font-bold uppercase tracking-widest text-brand-ink/40 ml-2">Primary Interest</label>
+                          <div className="relative">
+                            <ShoppingBasket className="absolute left-4 top-1/2 -translate-y-1/2 text-brand-ink/20" size={16} />
+                            <select
+                              className="w-full pl-12 pr-5 py-3.5 bg-brand-cream/50 border-none rounded-2xl focus:ring-2 focus:ring-brand-olive outline-none transition-all text-sm appearance-none cursor-pointer"
+                              value={formData.interest}
+                              onChange={(e) => setFormData({ ...formData, interest: e.target.value })}
+                            >
+                              <option value="spices">Premium Spices</option>
+                              <option value="dry-fruits">Bulk Dry Fruits</option>
+                              <option value="teas">Artisanal Teas</option>
+                              <option value="herbal-teas">Herbal & Wellness Teas</option>
+                              <option value="multiple">Multiple Categories</option>
+                            </select>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="space-y-4 pt-2">
+                        <label className="text-[9px] font-bold uppercase tracking-widest text-brand-ink/40 ml-2">Estimated Monthly Volume</label>
+                        <div className="grid grid-cols-2 gap-3">
+                          {['100-500kg', '500kg-2t', '2t-5t', '5t+'].map((v) => (
+                            <button
+                              key={v}
+                              type="button"
+                              onClick={() => setFormData({ ...formData, volume: v })}
+                              className={cn(
+                                "px-4 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest border transition-all",
+                                formData.volume === v
+                                  ? "bg-brand-olive border-brand-olive text-white shadow-lg shadow-brand-olive/20"
+                                  : "border-brand-cream text-brand-ink/60 hover:border-brand-olive hover:text-brand-olive bg-white/50"
+                              )}
+                            >
+                              {v}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </motion.div>

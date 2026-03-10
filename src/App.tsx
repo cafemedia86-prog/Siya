@@ -11,6 +11,7 @@ import { AnimatePresence } from 'motion/react';
 import { AdminProvider } from './context/AdminContext';
 import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { CartProvider } from './context/CartContext';
 
 // Admin Imports
 import { AdminLayout } from './pages/admin/AdminLayout';
@@ -40,48 +41,50 @@ export default function App() {
     <Router>
       <AuthProvider>
         <AdminProvider>
-          <ScrollToTop />
-          <div className="flex flex-col min-h-screen">
-            <Routes>
-              {/* Admin Login */}
-              <Route path="/admin/login" element={<AdminLogin />} />
+          <CartProvider>
+            <ScrollToTop />
+            <div className="flex flex-col min-h-screen">
+              <Routes>
+                {/* Admin Login */}
+                <Route path="/admin/login" element={<AdminLogin />} />
 
-              {/* Admin Routes */}
-              <Route path="/admin/*" element={
-                <ProtectedRoute>
-                  <AdminLayout>
-                    <Routes>
-                      <Route path="/" element={<AdminDashboard />} />
-                      <Route path="/products" element={<AdminProducts />} />
-                      <Route path="/categories" element={<AdminCategories />} />
-                      <Route path="/inquiries" element={<AdminInquiries />} />
-                      <Route path="/settings" element={<AdminSettings />} />
-                    </Routes>
-                  </AdminLayout>
-                </ProtectedRoute>
-              } />
-
-              {/* Public Routes */}
-              <Route path="/*" element={
-                <>
-                  <Navbar />
-                  <main className="flex-grow">
-                    <AnimatePresence mode="wait">
+                {/* Admin Routes */}
+                <Route path="/admin/*" element={
+                  <ProtectedRoute>
+                    <AdminLayout>
                       <Routes>
-                        <Route path="/" element={<HomePage />} />
-                        <Route path="/products" element={<ProductsPage />} />
-                        <Route path="/wholesale" element={<WholesalePage />} />
-                        <Route path="/about" element={<AboutPage />} />
-                        <Route path="/contact" element={<ContactPage />} />
-                        {/* 404 handler for public routes if needed */}
+                        <Route path="/" element={<AdminDashboard />} />
+                        <Route path="/products" element={<AdminProducts />} />
+                        <Route path="/categories" element={<AdminCategories />} />
+                        <Route path="/inquiries" element={<AdminInquiries />} />
+                        <Route path="/settings" element={<AdminSettings />} />
                       </Routes>
-                    </AnimatePresence>
-                  </main>
-                  <Footer />
-                </>
-              } />
-            </Routes>
-          </div>
+                    </AdminLayout>
+                  </ProtectedRoute>
+                } />
+
+                {/* Public Routes */}
+                <Route path="/*" element={
+                  <>
+                    <Navbar />
+                    <main className="flex-grow">
+                      <AnimatePresence mode="wait">
+                        <Routes>
+                          <Route path="/" element={<HomePage />} />
+                          <Route path="/products" element={<ProductsPage />} />
+                          <Route path="/wholesale" element={<WholesalePage />} />
+                          <Route path="/about" element={<AboutPage />} />
+                          <Route path="/contact" element={<ContactPage />} />
+                          {/* 404 handler for public routes if needed */}
+                        </Routes>
+                      </AnimatePresence>
+                    </main>
+                    <Footer />
+                  </>
+                } />
+              </Routes>
+            </div>
+          </CartProvider>
         </AdminProvider>
       </AuthProvider>
     </Router>

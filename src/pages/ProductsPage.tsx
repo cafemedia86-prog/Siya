@@ -12,6 +12,11 @@ export const ProductsPage = () => {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [selectedCategory, setSelectedCategory] = React.useState('all');
   const [sortBy, setSortBy] = React.useState<'trending' | 'price-low' | 'price-high'>('trending');
+  const [filters, setFilters] = React.useState({
+    pungency: 'all',
+    grade: 'all',
+    origin: 'all'
+  });
   const location = useLocation();
 
   // Handle hash changes for category deep-linking
@@ -42,7 +47,11 @@ export const ProductsPage = () => {
       const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.description.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
-      return matchesSearch && matchesCategory;
+      const matchesPungency = filters.pungency === 'all' || product.pungency === filters.pungency;
+      const matchesGrade = filters.grade === 'all' || product.grade === filters.grade;
+      const matchesOrigin = filters.origin === 'all' || product.origin.includes(filters.origin);
+
+      return matchesSearch && matchesCategory && matchesPungency && matchesGrade && matchesOrigin;
     })
     .sort((a, b) => {
       if (sortBy === 'price-low') return a.pricePerKg - b.pricePerKg;
@@ -153,6 +162,51 @@ export const ProductsPage = () => {
               </div>
             </div>
 
+            {/* Advanced Filters */}
+            {(selectedCategory === 'spices' || selectedCategory === 'all') && (
+              <div className="space-y-4">
+                <h3 className="text-[10px] font-bold uppercase tracking-widest text-brand-ink/40 mb-3 ml-2">Pungency Level</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  {['all', 'Mild', 'Medium', 'Hot', 'Extra Hot'].map((p) => (
+                    <button
+                      key={p}
+                      onClick={() => setFilters(f => ({ ...f, pungency: p }))}
+                      className={cn(
+                        "text-[9px] font-bold uppercase tracking-widest px-3 py-2 rounded-lg border transition-all",
+                        filters.pungency === p
+                          ? "bg-brand-terracotta/10 border-brand-terracotta text-brand-terracotta"
+                          : "border-brand-cream text-brand-ink/40 hover:border-brand-ink/20"
+                      )}
+                    >
+                      {p === 'all' ? 'All Heat' : p}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {(selectedCategory === 'teas' || selectedCategory === 'dry-fruits' || selectedCategory === 'all') && (
+              <div className="space-y-4">
+                <h3 className="text-[10px] font-bold uppercase tracking-widest text-brand-ink/40 mb-3 ml-2">Export Grade</h3>
+                <div className="flex flex-wrap gap-2">
+                  {['all', 'W240', 'W320', 'CTC', 'Extra Bold'].map((g) => (
+                    <button
+                      key={g}
+                      onClick={() => setFilters(f => ({ ...f, grade: g }))}
+                      className={cn(
+                        "text-[9px] font-bold uppercase tracking-widest px-3 py-2 rounded-lg border transition-all",
+                        filters.grade === g
+                          ? "bg-brand-olive text-white border-brand-olive"
+                          : "border-brand-cream text-brand-ink/40 hover:border-brand-ink/20"
+                      )}
+                    >
+                      {g === 'all' ? 'All Grades' : g}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Special Offer Card */}
             <div className="bg-brand-terracotta rounded-[2rem] p-8 text-white relative overflow-hidden group">
               <div className="relative z-10">
@@ -194,7 +248,11 @@ export const ProductsPage = () => {
                 <h3 className="text-2xl font-serif font-bold mb-2">No products found</h3>
                 <p className="text-brand-ink/60 text-sm">Try adjusting your search or filters to find what you're looking for.</p>
                 <button
-                  onClick={() => { setSearchQuery(''); setSelectedCategory('all'); }}
+                  onClick={() => {
+                    setSearchQuery('');
+                    setSelectedCategory('all');
+                    setFilters({ pungency: 'all', grade: 'all', origin: 'all' });
+                  }}
                   className="mt-8 text-brand-terracotta font-bold uppercase tracking-widest text-[10px] hover:underline"
                 >
                   Clear all filters

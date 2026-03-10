@@ -9,6 +9,8 @@ export interface Product {
   origin: string;
   benefits?: string[];
   featured?: boolean;
+  pungency?: 'Mild' | 'Medium' | 'Hot' | 'Extra Hot';
+  grade?: 'W240' | 'W320' | 'CTC' | 'First Flush' | 'Second Flush' | 'Extra Bold';
 }
 
 export interface Category {

@@ -1,8 +1,10 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { MapPin, Package, ArrowRight } from 'lucide-react';
+import { MapPin, Package, ArrowRight, Plus, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Product } from '../types';
+import { useCart } from '../context/CartContext';
+import { cn } from '../lib/utils';
 
 interface ProductCardProps {
   product: Product;
@@ -10,6 +12,9 @@ interface ProductCardProps {
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
+  const { addToCart, items } = useCart();
+  const isInCart = items.some(item => item.id === product.id);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -61,14 +66,36 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index }) => {
           </div>
         </div>
 
-        <Link
-          to="/wholesale"
-          className="w-full mt-5 bg-brand-ink text-white py-3 rounded-xl font-bold uppercase tracking-widest text-[9px] hover:bg-brand-olive hover:scale-[1.02] transition-all flex items-center justify-center gap-2 shadow-lg shadow-brand-ink/5 group"
-          aria-label={`Request a quote for ${product.name}`}
-        >
-          Request Quote
-          <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
-        </Link>
+        <div className="grid grid-cols-2 gap-3 mt-5">
+          <button
+            onClick={() => addToCart(product, `${product.minOrder}kg`)}
+            className={cn(
+              "flex-1 py-3 rounded-xl font-bold uppercase tracking-widest text-[8px] transition-all flex items-center justify-center gap-2 shadow-lg",
+              isInCart
+                ? "bg-emerald-500 text-white shadow-emerald-500/10"
+                : "bg-brand-olive text-white shadow-brand-olive/5 hover:bg-brand-ink hover:scale-[1.02]"
+            )}
+            aria-label={`Add ${product.name} to inquiry basket`}
+          >
+            {isInCart ? (
+              <>
+                <Check size={12} /> In Basket
+              </>
+            ) : (
+              <>
+                <Plus size={12} /> Add to Quote
+              </>
+            )}
+          </button>
+
+          <Link
+            to="/wholesale"
+            className="flex-1 bg-brand-ink text-white py-3 rounded-xl font-bold uppercase tracking-widest text-[8px] hover:bg-brand-olive hover:scale-[1.02] transition-all flex items-center justify-center gap-2 shadow-lg shadow-brand-ink/5 group"
+            aria-label={`Direct inquiry for ${product.name}`}
+          >
+            Direct Inquiry
+          </Link>
+        </div>
       </div>
     </motion.div>
   );

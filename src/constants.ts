@@ -56,6 +56,7 @@ export const PRODUCTS: Product[] = [
     minOrder: 100,
     origin: 'Guntur, India',
     image: 'https://images.unsplash.com/photo-1588252303782-cb80119abd6d?auto=format&fit=crop&q=90&w=1000',
+    pungency: 'Extra Hot'
   },
   {
     id: 's2',
@@ -77,6 +78,7 @@ export const PRODUCTS: Product[] = [
     origin: 'Kerala, India',
     image: 'https://finebuy.co.in/wp-content/uploads/2022/07/Green-Cardamom.webp',
     featured: true,
+    grade: 'Extra Bold'
   },
   {
     id: 's4',
@@ -109,6 +111,7 @@ export const PRODUCTS: Product[] = [
     minOrder: 50,
     origin: 'Assam, India',
     image: 'https://images.unsplash.com/photo-1594631252845-29fc4cc8cde9?auto=format&fit=crop&q=90&w=1000',
+    grade: 'CTC'
   },
   {
     id: 't2',
@@ -165,6 +168,7 @@ export const PRODUCTS: Product[] = [
     origin: 'Konkan, India',
     image: 'https://images.unsplash.com/photo-1590502593747-42a996133562?auto=format&fit=crop&q=90&w=1000',
     featured: true,
+    grade: 'W240'
   },
   {
     id: 'df2',

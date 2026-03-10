@@ -16,10 +16,14 @@ import {
     CheckCircle2,
     Globe,
     FileText,
-    Download
+    Download,
+    FileDown,
+    Printer
 } from 'lucide-react';
 import { useAdmin } from '../../context/AdminContext';
 import { cn } from '../../lib/utils';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 export const AdminInquiries = () => {
     const { inquiries, updateInquiryStatus, deleteInquiry, isLoading } = useAdmin();
@@ -38,6 +42,17 @@ export const AdminInquiries = () => {
     const [selectedStatus, setSelectedStatus] = React.useState('all');
     const [selectedInquiry, setSelectedInquiry] = React.useState<any>(null);
     const [sortBy, setSortBy] = React.useState('newest');
+    const [isQuoteFormOpen, setIsQuoteFormOpen] = React.useState(false);
+    const [quoteItems, setQuoteItems] = React.useState<{ name: string; price: string }[]>([]);
+
+    const parseBasketItems = (message: string) => {
+        const basketSection = message.split('Basket Items:')[1];
+        if (!basketSection) return [];
+        return basketSection.trim().split('\n').map(line => {
+            const match = line.match(/^-\s*(.*?)\s*\((.*?)\)$/);
+            return match ? { name: match[1], volume: match[2] } : { name: line.replace('- ', '').trim(), volume: 'As per demand' };
+        });
+    };
 
     const filteredInquiries = inquiries.filter((inq) => {
         const matchesSearch = inq.partner.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -80,6 +95,159 @@ export const AdminInquiries = () => {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    };
+
+    const generatePDFQuote = (inq: any, customPrices?: { name: string; price: string }[]) => {
+        const doc = new jsPDF();
+        const date = new Date().toLocaleDateString();
+        const expiryDate = new Date();
+        expiryDate.setDate(expiryDate.getDate() + 30);
+
+        // Layout Constants
+        const olive: [number, number, number] = [61, 61, 45];
+        const terracotta: [number, number, number] = [166, 93, 74];
+        const margin = 20;
+
+        // Header Background
+        doc.setFillColor(olive[0], olive[1], olive[2]);
+        doc.rect(0, 0, 210, 60, 'F');
+
+        // Brand Identity
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('times', 'bold');
+        doc.setFontSize(32);
+        doc.text("SIYA'S", margin, 35);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        doc.text("PREMIUM SPICES & TEAS EXPORT", margin, 42);
+
+        // Invoice/Quote Title
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(18);
+        doc.text("WHOLESALE QUOTATION", 210 - margin, 35, { align: 'right' });
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.text(`REFERENCE: #QSYS-${inq.id.slice(0, 8).toUpperCase()}`, 210 - margin, 42, { align: 'right' });
+
+        // Seller & Buyer Section
+        doc.setTextColor(50, 50, 50);
+        const startY = 80;
+
+        // Seller Info (Left)
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10);
+        doc.text("FROM:", margin, startY);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.text("Siya's Premium Spices (Exports Division)", margin, startY + 6);
+        doc.text("524, Sector 38, B2B Trade Desk", margin, startY + 11);
+        doc.text("Gurgaon, Haryana, 122001, INDIA", margin, startY + 16);
+        doc.text("GSTIN: 07AAACS1234F1Z5", margin, startY + 21);
+
+        // Buyer Info (Right)
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10);
+        doc.text("PREPARED FOR:", 210 - margin, startY, { align: 'right' });
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(11);
+        doc.text(inq.partner, 210 - margin, startY + 7, { align: 'right' });
+        doc.setFontSize(9);
+        doc.text(inq.company, 210 - margin, startY + 12, { align: 'right' });
+        doc.text(inq.country, 210 - margin, startY + 17, { align: 'right' });
+        doc.text(inq.email, 210 - margin, startY + 22, { align: 'right' });
+
+        // Dates Section
+        doc.setDrawColor(240, 240, 240);
+        doc.line(margin, startY + 32, 210 - margin, startY + 32);
+        doc.setFontSize(8);
+        doc.text(`ISSUE DATE: ${date}`, margin, startY + 38);
+        doc.text(`EXPIRY DATE: ${expiryDate.toLocaleDateString()}`, 210 - margin, startY + 38, { align: 'right' });
+
+        // Table Implementation
+        const itemsToProcess = customPrices && customPrices.length > 0
+            ? customPrices.map(p => [p.name || inq.interest, inq.volume, "Custom B2B", `$ ${p.price || '---'}`])
+            : [[inq.interest || "Premium Selection", inq.volume, "Standard", "Contact for Rate"]];
+
+        autoTable(doc, {
+            startY: startY + 45,
+            margin: { left: margin, right: margin },
+            head: [['PRODUCT DESCRIPTION', 'REQUISITION VOLUME', 'COMMERCIAL TIER', 'UNIT PRICE (FOB)']],
+            body: itemsToProcess,
+            styles: {
+                font: 'helvetica',
+                fontSize: 9,
+                cellPadding: 6,
+                lineWidth: 0.1,
+                lineColor: [240, 240, 240]
+            },
+            headStyles: {
+                fillColor: olive,
+                textColor: [255, 255, 255],
+                fontStyle: 'bold',
+                halign: 'center'
+            },
+            columnStyles: {
+                0: { fontStyle: 'bold' },
+                1: { halign: 'center' },
+                2: { halign: 'center' },
+                3: { halign: 'right', fontStyle: 'bold', textColor: terracotta }
+            }
+        });
+
+        const endY = (doc as any).lastAutoTable.finalY + 15;
+
+        // Logistics & Terms
+        doc.setFontSize(10);
+        doc.setFont('helvetica', 'bold');
+        doc.text("DELIVERY & COMMERCIAL TERMS", margin, endY);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        const terms = [
+            "• Pricing is quoted in FOB (Free on Board) incoterms unless specified otherwise.",
+            "• Minimum Order Quantity (MOQ) varies by product category.",
+            "• Payment Terms: 30% Advance, 70% against BL/Shipping Documents.",
+            "• Export documentation like Certificate of Origin, Phytosanitary, and SGS/Intertek provided as per order."
+        ];
+        terms.forEach((term, i) => doc.text(term, margin, endY + 8 + (5 * i)));
+
+        // Additional Message/Note
+        if (inq.message) {
+            doc.setFont('helvetica', 'bold');
+            doc.text("REMARKS:", margin, endY + 35);
+            doc.setFont('helvetica', 'normal');
+            const splitMsg = doc.splitTextToSize(inq.message, 170);
+            doc.text(splitMsg, margin, endY + 41);
+        }
+
+        // Signature Section
+        const sigY = 250;
+        doc.setFillColor(248, 248, 248);
+        doc.rect(margin, sigY, 210 - (margin * 2), 30, 'F');
+
+        // Left: Signatory Line
+        doc.setDrawColor(terracotta[0], terracotta[1], terracotta[2]);
+        doc.setLineWidth(0.5);
+        doc.line(margin + 10, sigY + 18, margin + 70, sigY + 18);
+        doc.setFontSize(7);
+        doc.setTextColor(50, 50, 50);
+        doc.text("AUTHORIZED SIGNATORY", margin + 10, sigY + 24);
+
+        // Right: Disclaimer Text
+        doc.setFontSize(7);
+        doc.setTextColor(150, 150, 150);
+        const disclaimer = "This is a computer-generated quotation and does not require a physical stamp for digital validation. Valid for 30 days.";
+        const splitDisclaimer = doc.splitTextToSize(disclaimer, 80);
+        doc.text(splitDisclaimer, 210 - margin - 10, sigY + 12, { align: 'right' });
+
+        // Contact Footer
+        doc.setFillColor(olive[0], olive[1], olive[2]);
+        doc.rect(0, 287, 210, 10, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(7);
+        doc.text("www.siyas.com | export@siyas.com | +91 9999990469 | Siya's Spices Mumbai Branch", 105, 293, { align: 'center' });
+
+        doc.save(`Siya_Quotation_${inq.partner.replace(/\s/g, '_')}.pdf`);
     };
 
     const stats = [
@@ -232,7 +400,20 @@ export const AdminInquiries = () => {
                                     <select
                                         className="w-full bg-neutral-100 border-none rounded-xl px-4 py-3 text-[8px] font-bold uppercase tracking-widest cursor-pointer outline-none hover:bg-neutral-200 transition-colors text-neutral-900"
                                         value={inq.status}
-                                        onChange={(e) => updateInquiryStatus(inq.id, e.target.value as any)}
+                                        onChange={(e) => {
+                                            const newStatus = e.target.value as any;
+                                            updateInquiryStatus(inq.id, newStatus);
+                                            if (newStatus === 'Quoted') {
+                                                const itemsToQuote = parseBasketItems(inq.message);
+                                                if (itemsToQuote.length > 0) {
+                                                    setQuoteItems(itemsToQuote.map(item => ({ name: item.name, price: '' })));
+                                                } else {
+                                                    setQuoteItems([{ name: inq.interest || inq.product, price: '' }]);
+                                                }
+                                                setSelectedInquiry(inq);
+                                                setIsQuoteFormOpen(true);
+                                            }
+                                        }}
                                     >
                                         <option value="Pending">Queue</option>
                                         <option value="Replying">Engaged</option>
@@ -311,24 +492,32 @@ export const AdminInquiries = () => {
                                         </div>
                                     </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                        <div className="p-8 bg-neutral-50 rounded-[2.5rem] border border-neutral-100 flex items-center gap-6">
-                                            <div className="w-16 h-16 rounded-2xl bg-[#5A5A40]/10 flex items-center justify-center text-[#5A5A40]">
-                                                <Package size={28} />
+                                    <div className="grid grid-cols-1 gap-8">
+                                        <div className="p-8 bg-neutral-50 rounded-[2.5rem] border border-neutral-100 flex flex-col gap-6">
+                                            <div className="flex items-center gap-6">
+                                                <div className="w-16 h-16 rounded-2xl bg-[#5A5A40]/10 flex items-center justify-center text-[#5A5A40]">
+                                                    <Package size={28} />
+                                                </div>
+                                                <div>
+                                                    <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mb-1">Lead Interest</p>
+                                                    <p className="text-xl font-bold">{selectedInquiry.interest}</p>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mb-1">Product Category</p>
-                                                <p className="text-xl font-bold">{selectedInquiry.interest}</p>
-                                            </div>
-                                        </div>
-                                        <div className="p-8 bg-neutral-50 rounded-[2.5rem] border border-neutral-100 flex items-center gap-6">
-                                            <div className="w-16 h-16 rounded-2xl bg-[#a65d4a]/10 flex items-center justify-center text-[#a65d4a]">
-                                                <TrendingUp size={28} />
-                                            </div>
-                                            <div>
-                                                <p className="text-[10px] font-bold uppercase tracking-widest text-neutral-400 mb-1">Target Volume</p>
-                                                <p className="text-xl font-bold">{selectedInquiry.volume}</p>
-                                            </div>
+
+                                            {/* Detail Items display */}
+                                            {parseBasketItems(selectedInquiry.message).length > 0 && (
+                                                <div className="space-y-3 pt-4 border-t border-neutral-200">
+                                                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-[#a65d4a]">Selected Products ({parseBasketItems(selectedInquiry.message).length})</p>
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                        {parseBasketItems(selectedInquiry.message).map((item, idx) => (
+                                                            <div key={idx} className="bg-white p-4 rounded-2xl border border-neutral-100 shadow-sm flex items-center justify-between">
+                                                                <span className="text-xs font-bold text-neutral-700">{item.name}</span>
+                                                                <span className="px-3 py-1 bg-neutral-100 rounded-lg text-[9px] font-black">{item.volume}</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -360,6 +549,20 @@ export const AdminInquiries = () => {
                                     </div>
 
                                     <div className="space-y-4">
+                                        <button
+                                            onClick={() => {
+                                                const items = parseBasketItems(selectedInquiry.message);
+                                                if (items.length > 0) {
+                                                    setQuoteItems(items.map(item => ({ name: item.name, price: '' })));
+                                                } else {
+                                                    setQuoteItems([{ name: selectedInquiry.interest || selectedInquiry.product, price: '' }]);
+                                                }
+                                                setIsQuoteFormOpen(true);
+                                            }}
+                                            className="w-full inline-flex items-center justify-center gap-4 bg-white border-2 border-brand-terracotta text-brand-terracotta py-6 rounded-3xl text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-brand-terracotta hover:text-white transition-all shadow-xl group"
+                                        >
+                                            <FileDown size={20} className="group-hover:translate-y-1 transition-transform" /> Generate PDF Quote
+                                        </button>
                                         <a
                                             href={`mailto:${selectedInquiry.email}?subject=Regarding your inquiry for ${selectedInquiry.interest}`}
                                             className="w-full inline-flex items-center justify-center gap-4 bg-neutral-900 text-white py-6 rounded-3xl text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-black transition-all shadow-2xl group"
@@ -369,6 +572,72 @@ export const AdminInquiries = () => {
                                         <p className="text-[10px] text-center text-neutral-400 font-medium italic">Opening default mail client for direct engagement.</p>
                                     </div>
                                 </div>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+
+            {/* Price Customization Sub-Modal */}
+            <AnimatePresence>
+                {isQuoteFormOpen && (
+                    <div className="fixed inset-0 z-[300] flex items-center justify-center p-6">
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setIsQuoteFormOpen(false)}
+                            className="absolute inset-0 bg-neutral-900/60 backdrop-blur-sm"
+                        />
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            className="relative w-full max-w-2xl bg-white rounded-[3rem] shadow-2xl overflow-hidden p-12"
+                        >
+                            <h3 className="text-3xl font-serif font-bold mb-2">Customize Quotation</h3>
+                            <p className="text-sm text-neutral-400 font-medium mb-10">Set specific B2B pricing for the requested items according to demand sizes.</p>
+
+                            <div className="space-y-6 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar mb-10">
+                                {quoteItems.map((item, idx) => (
+                                    <div key={idx} className="bg-neutral-50 p-6 rounded-3xl border border-neutral-100">
+                                        <div className="flex flex-col gap-4">
+                                            <label className="text-[10px] font-black uppercase tracking-widest text-neutral-400">Price for: {item.name}</label>
+                                            <div className="flex items-center gap-4">
+                                                <span className="text-xl font-bold">$</span>
+                                                <input
+                                                    type="text"
+                                                    placeholder="Enter price per kg (e.g. 12.50)"
+                                                    value={item.price}
+                                                    onChange={(e) => {
+                                                        const newItems = [...quoteItems];
+                                                        newItems[idx].price = e.target.value;
+                                                        setQuoteItems(newItems);
+                                                    }}
+                                                    className="w-full bg-white border border-neutral-200 rounded-2xl px-6 py-4 text-sm font-bold shadow-sm outline-none focus:ring-2 focus:ring-[#a65d4a] transition-all"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="flex gap-4">
+                                <button
+                                    onClick={() => setIsQuoteFormOpen(false)}
+                                    className="flex-1 px-8 py-5 border-2 border-neutral-100 rounded-2xl text-[11px] font-bold uppercase tracking-widest text-neutral-400 hover:bg-neutral-50 transition-all"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        generatePDFQuote(selectedInquiry, quoteItems);
+                                        setIsQuoteFormOpen(false);
+                                    }}
+                                    className="flex-[2] px-8 py-5 bg-neutral-900 text-white rounded-2xl text-[11px] font-bold uppercase tracking-widest hover:bg-black transition-all flex items-center justify-center gap-3 shadow-xl"
+                                >
+                                    <FileDown size={18} /> Generate Official Quote
+                                </button>
                             </div>
                         </motion.div>
                     </div>

@@ -68,14 +68,14 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+                        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] lg:hidden"
                     />
                 )}
             </AnimatePresence>
 
             {/* Sidebar */}
             <aside className={cn(
-                "fixed lg:sticky top-0 left-0 h-screen w-72 flex flex-col bg-neutral-50/50 border-r border-neutral-100 text-neutral-900 z-50 transition-transform duration-500 lg:translate-x-0",
+                "fixed lg:sticky top-0 left-0 h-screen w-72 flex flex-col bg-neutral-50/50 border-r border-neutral-100 text-neutral-900 z-40 transition-transform duration-500 lg:translate-x-0 outline-none",
                 isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
             )}>
                 <div className="p-10 flex items-center justify-between">
@@ -143,7 +143,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             </aside>
 
             {/* Main Content */}
-            <div className="flex-1 flex flex-col min-w-0 relative z-10">
+            <div className="flex-1 flex flex-col min-w-0 relative">
                 {/* Header */}
                 <header className="h-20 lg:h-24 px-6 lg:px-10 flex items-center justify-between sticky top-0 z-30 bg-white/80 backdrop-blur-md lg:bg-transparent lg:backdrop-blur-none border-b border-neutral-100 lg:border-none">
                     <div className="flex items-center gap-4">
