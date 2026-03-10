@@ -1,11 +1,12 @@
 import React from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
-import { PRODUCTS } from '../constants';
+import { useAdmin } from '../context/AdminContext';
 import { ProductCard } from './ProductCard';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles } from 'lucide-react';
 
 export const FeaturedProducts = () => {
+  const { products, isLoading } = useAdmin();
   const containerRef = React.useRef(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -14,7 +15,9 @@ export const FeaturedProducts = () => {
 
   const y = useTransform(scrollYProgress, [0, 1], [0, -50]);
 
-  const featured = PRODUCTS.filter(p => p.featured).slice(0, 4);
+  if (isLoading) return null;
+
+  const featured = products.filter(p => p.featured).slice(0, 4);
 
   return (
     <section ref={containerRef} className="py-32 bg-white relative overflow-hidden">

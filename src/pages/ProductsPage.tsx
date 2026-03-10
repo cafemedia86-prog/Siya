@@ -8,7 +8,7 @@ import { useLocation } from 'react-router-dom';
 import { useAdmin } from '../context/AdminContext';
 
 export const ProductsPage = () => {
-  const { products } = useAdmin();
+  const { products, categories, isLoading } = useAdmin();
   const [searchQuery, setSearchQuery] = React.useState('');
   const [selectedCategory, setSelectedCategory] = React.useState('all');
   const [sortBy, setSortBy] = React.useState<'trending' | 'price-low' | 'price-high'>('trending');
@@ -17,14 +17,25 @@ export const ProductsPage = () => {
   // Handle hash changes for category deep-linking
   React.useEffect(() => {
     const hash = location.hash.replace('#', '');
-    if (hash) {
-      const category = CATEGORIES.find(c => c.slug === hash);
+    if (hash && categories.length > 0) {
+      const category = categories.find(c => c.slug === hash);
       if (category) {
-        setSelectedCategory(category.id);
+        setSelectedCategory(category.slug);
         window.scrollTo({ top: 300, behavior: 'smooth' });
       }
     }
-  }, [location.hash]);
+  }, [location.hash, categories]);
+
+  if (isLoading) {
+    return (
+      <div className="pt-40 min-h-screen bg-brand-cream flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-brand-cream border-t-brand-olive rounded-full animate-spin" />
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-olive opacity-40">Loading Premium Catalog...</p>
+        </div>
+      </div>
+    );
+  }
 
   const filteredProducts = products
     .filter((product) => {
@@ -125,13 +136,13 @@ export const ProductsPage = () => {
                 >
                   All Products
                 </button>
-                {CATEGORIES.map((cat) => (
+                {categories.map((cat) => (
                   <button
                     key={cat.id}
-                    onClick={() => setSelectedCategory(cat.id)}
+                    onClick={() => setSelectedCategory(cat.slug)}
                     className={cn(
                       "w-full text-left px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all",
-                      selectedCategory === cat.id
+                      selectedCategory === cat.slug
                         ? "bg-brand-olive text-white shadow-lg shadow-brand-olive/20"
                         : "text-brand-ink/60 hover:bg-white hover:text-brand-olive"
                     )}

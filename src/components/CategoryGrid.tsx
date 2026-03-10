@@ -1,15 +1,18 @@
 import React from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
-import { CATEGORIES } from '../constants';
+import { useAdmin } from '../context/AdminContext';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight } from 'lucide-react';
 
 export const CategoryGrid = () => {
+  const { categories, isLoading } = useAdmin();
   const containerRef = React.useRef(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start end", "end start"]
   });
+
+  if (isLoading) return null;
 
   const textX = useTransform(scrollYProgress, [0, 1], [100, -100]);
 
@@ -33,7 +36,7 @@ export const CategoryGrid = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {CATEGORIES.map((category, index) => (
+          {categories.map((category, index) => (
             <motion.div
               key={category.id}
               initial={{ opacity: 0, y: 30 }}

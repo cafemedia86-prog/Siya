@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Product, Category } from '../types';
 import { PRODUCTS as INITIAL_PRODUCTS, CATEGORIES } from '../constants';
+import { supabase } from '../lib/supabase';
 
 interface Inquiry {
     id: string;
@@ -28,13 +29,14 @@ interface AdminContextType {
     inquiries: Inquiry[];
     categories: Category[];
     companyInfo: CompanyInfo;
-    addProduct: (product: Omit<Product, 'id'>) => void;
-    updateProduct: (id: string, product: Partial<Product>) => void;
-    deleteProduct: (id: string) => void;
-    updateInquiryStatus: (id: string, status: Inquiry['status']) => void;
-    deleteInquiry: (id: string) => void;
-    addInquiry: (inquiry: Omit<Inquiry, 'id' | 'date' | 'status'>) => void;
-    updateCompanyInfo: (info: CompanyInfo) => void;
+    isLoading: boolean;
+    addProduct: (product: Omit<Product, 'id'>) => Promise<void>;
+    updateProduct: (id: string, product: Partial<Product>) => Promise<void>;
+    deleteProduct: (id: string) => Promise<void>;
+    updateInquiryStatus: (id: string, status: Inquiry['status']) => Promise<void>;
+    deleteInquiry: (id: string) => Promise<void>;
+    addInquiry: (inquiry: Omit<Inquiry, 'id' | 'date' | 'status'>) => Promise<void>;
+    updateCompanyInfo: (info: CompanyInfo) => Promise<void>;
 }
 
 const INITIAL_INQUIRIES: Inquiry[] = [
@@ -54,74 +56,193 @@ const INITIAL_COMPANY_INFO: CompanyInfo = {
 const AdminContext = createContext<AdminContextType | undefined>(undefined);
 
 export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [products, setProducts] = useState<Product[]>(() => {
-        const saved = localStorage.getItem('siyas_products');
-        return saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
-    });
-
-    const [inquiries, setInquiries] = useState<Inquiry[]>(() => {
-        const saved = localStorage.getItem('siyas_inquiries');
-        return saved ? JSON.parse(saved) : INITIAL_INQUIRIES;
-    });
-
-    const [companyInfo, setCompanyInfo] = useState<CompanyInfo>(() => {
-        const saved = localStorage.getItem('siyas_company_info');
-        return saved ? JSON.parse(saved) : INITIAL_COMPANY_INFO;
-    });
+    const [products, setProducts] = useState<Product[]>([]);
+    const [inquiries, setInquiries] = useState<Inquiry[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]); // Initialize as empty, will be fetched
+    const [companyInfo, setCompanyInfo] = useState<CompanyInfo>(INITIAL_COMPANY_INFO);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        localStorage.setItem('siyas_products', JSON.stringify(products));
-    }, [products]);
+        fetchData();
+    }, []);
 
-    useEffect(() => {
-        localStorage.setItem('siyas_inquiries', JSON.stringify(inquiries));
-    }, [inquiries]);
+    const fetchData = async () => {
+        try {
+            setIsLoading(true);
 
-    useEffect(() => {
-        localStorage.setItem('siyas_company_info', JSON.stringify(companyInfo));
-    }, [companyInfo]);
+            // Fetch Categories
+            const { data: categoriesData, error: categoriesError } = await supabase
+                .from('categories')
+                .select('*');
 
-    const addProduct = (product: Omit<Product, 'id'>) => {
-        const newProduct = { ...product, id: Math.random().toString(36).substr(2, 9) };
-        setProducts([...products, newProduct as Product]);
+            if (categoriesError) throw categoriesError;
+            if (categoriesData && categoriesData.length > 0) {
+                setCategories(categoriesData as Category[]);
+            } else {
+                setCategories(CATEGORIES); // Fallback to local constant if Supabase is empty
+            }
+
+            // Fetch Products
+            const { data: productsData, error: productsError } = await supabase
+                .from('products')
+                .select('*')
+                .order('id', { ascending: false });
+
+            if (productsError) throw productsError;
+
+            // Map snake_case to camelCase
+            const mappedProducts = productsData.map(p => ({
+                id: p.id,
+                name: p.name,
+                category: p.category,
+                description: p.description,
+                pricePerKg: Number(p.price_per_kg),
+                minOrder: p.min_order,
+                origin: p.origin,
+                image: p.image,
+                featured: p.featured
+            }));
+
+            // Fetch Inquiries
+            const { data: inqsData, error: inqsError } = await supabase
+                .from('inquiries')
+                .select('*')
+                .order('date', { ascending: false });
+
+            if (inqsError) throw inqsError;
+
+            // Fetch Company Info
+            const { data: infoData, error: infoError } = await supabase
+                .from('company_info')
+                .select('*')
+                .eq('id', 'main')
+                .single();
+
+            if (infoError && infoError.code !== 'PGRST116') throw infoError; // PGRST116 is "No rows found"
+
+            setProducts(mappedProducts.length > 0 ? mappedProducts : INITIAL_PRODUCTS);
+            setInquiries(inqsData.length > 0 ? inqsData as Inquiry[] : INITIAL_INQUIRIES);
+            if (infoData) setCompanyInfo(infoData as CompanyInfo);
+
+        } catch (error) {
+            console.error('Error fetching data from Supabase:', error);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
-    const updateProduct = (id: string, updatedFields: Partial<Product>) => {
-        setProducts(products.map(p => p.id === id ? { ...p, ...updatedFields } : p));
+    const addProduct = async (product: Omit<Product, 'id'>) => {
+        const id = Math.random().toString(36).substr(2, 9);
+        const newProduct = { ...product, id };
+
+        try {
+            const { error } = await supabase.from('products').insert([{
+                id,
+                name: product.name,
+                category: product.category,
+                description: product.description,
+                price_per_kg: product.pricePerKg,
+                min_order: product.minOrder,
+                origin: product.origin,
+                image: product.image,
+                featured: product.featured
+            }]);
+
+            if (error) throw error;
+            setProducts([newProduct as Product, ...products]);
+        } catch (error) {
+            console.error('Error adding product:', error);
+        }
     };
 
-    const deleteProduct = (id: string) => {
-        setProducts(products.filter(p => p.id !== id));
+    const updateProduct = async (id: string, updatedFields: Partial<Product>) => {
+        try {
+            const dbFields: any = {};
+            if (updatedFields.name) dbFields.name = updatedFields.name;
+            if (updatedFields.category) dbFields.category = updatedFields.category;
+            if (updatedFields.description) dbFields.description = updatedFields.description;
+            if (updatedFields.pricePerKg !== undefined) dbFields.price_per_kg = updatedFields.pricePerKg;
+            if (updatedFields.minOrder !== undefined) dbFields.min_order = updatedFields.minOrder;
+            if (updatedFields.origin) dbFields.origin = updatedFields.origin;
+            if (updatedFields.image) dbFields.image = updatedFields.image;
+            if (updatedFields.featured !== undefined) dbFields.featured = updatedFields.featured;
+
+            const { error } = await supabase
+                .from('products')
+                .update(dbFields)
+                .eq('id', id);
+
+            if (error) throw error;
+            setProducts(products.map(p => p.id === id ? { ...p, ...updatedFields } : p));
+        } catch (error) {
+            console.error('Error updating product:', error);
+        }
     };
 
-    const addInquiry = (inq: Omit<Inquiry, 'id' | 'date' | 'status'>) => {
-        const newInquiry: Inquiry = {
-            ...inq,
-            id: Math.random().toString(36).substr(2, 9),
-            date: new Date().toISOString().split('T')[0],
-            status: 'Pending'
-        };
-        setInquiries([newInquiry, ...inquiries]);
+    const deleteProduct = async (id: string) => {
+        try {
+            const { error } = await supabase.from('products').delete().eq('id', id);
+            if (error) throw error;
+            setProducts(products.filter(p => p.id !== id));
+        } catch (error) {
+            console.error('Error deleting product:', error);
+        }
     };
 
-    const updateInquiryStatus = (id: string, status: Inquiry['status']) => {
-        setInquiries(inquiries.map(inq => inq.id === id ? { ...inq, status } : inq));
+    const addInquiry = async (inq: Omit<Inquiry, 'id' | 'date' | 'status'>) => {
+        const id = Math.random().toString(36).substr(2, 9);
+        const date = new Date().toISOString().split('T')[0];
+        const newInquiry: Inquiry = { ...inq, id, date, status: 'Pending' };
+
+        try {
+            const { error } = await supabase.from('inquiries').insert([newInquiry]);
+            if (error) throw error;
+            setInquiries([newInquiry, ...inquiries]);
+        } catch (error) {
+            console.error('Error adding inquiry:', error);
+        }
     };
 
-    const deleteInquiry = (id: string) => {
-        setInquiries(inquiries.filter(inq => inq.id !== id));
+    const updateInquiryStatus = async (id: string, status: Inquiry['status']) => {
+        try {
+            const { error } = await supabase.from('inquiries').update({ status }).eq('id', id);
+            if (error) throw error;
+            setInquiries(inquiries.map(inq => inq.id === id ? { ...inq, status } : inq));
+        } catch (error) {
+            console.error('Error updating inquiry status:', error);
+        }
     };
 
-    const updateCompanyInfo = (info: CompanyInfo) => {
-        setCompanyInfo(info);
+    const deleteInquiry = async (id: string) => {
+        try {
+            const { error } = await supabase.from('inquiries').delete().eq('id', id);
+            if (error) throw error;
+            setInquiries(inquiries.filter(inq => inq.id !== id));
+        } catch (error) {
+            console.error('Error deleting inquiry:', error);
+        }
+    };
+
+    const updateCompanyInfo = async (info: CompanyInfo) => {
+        try {
+            const { error } = await supabase
+                .from('company_info')
+                .upsert({ id: 'main', ...info });
+
+            if (error) throw error;
+            setCompanyInfo(info);
+        } catch (error) {
+            console.error('Error updating company info:', error);
+        }
     };
 
     return (
         <AdminContext.Provider value={{
             products,
             inquiries,
-            categories: CATEGORIES,
+            categories,
             companyInfo,
+            isLoading,
             addProduct,
             updateProduct,
             deleteProduct,
