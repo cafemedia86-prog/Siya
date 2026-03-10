@@ -37,6 +37,7 @@ interface AdminContextType {
     deleteInquiry: (id: string) => Promise<void>;
     addInquiry: (inquiry: Omit<Inquiry, 'id' | 'date' | 'status'>) => Promise<void>;
     updateCompanyInfo: (info: CompanyInfo) => Promise<void>;
+    updateCategory: (id: string, category: Partial<Category>) => Promise<void>;
 }
 
 const INITIAL_INQUIRIES: Inquiry[] = [
@@ -239,6 +240,20 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         }
     };
 
+    const updateCategory = async (id: string, updatedFields: Partial<Category>) => {
+        try {
+            const { error } = await supabase
+                .from('categories')
+                .update(updatedFields)
+                .eq('id', id);
+
+            if (error) throw error;
+            setCategories(categories.map(c => c.id === id ? { ...c, ...updatedFields } : c));
+        } catch (error) {
+            console.error('Error updating category:', error);
+        }
+    };
+
     return (
         <AdminContext.Provider value={{
             products,
@@ -252,7 +267,8 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             updateInquiryStatus,
             deleteInquiry,
             addInquiry,
-            updateCompanyInfo
+            updateCompanyInfo,
+            updateCategory
         }}>
             {children}
         </AdminContext.Provider>

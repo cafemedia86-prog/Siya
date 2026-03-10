@@ -10,7 +10,8 @@ import {
     Bell,
     Search,
     User,
-    Globe
+    Globe,
+    LayoutGrid
 } from 'lucide-react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '../../lib/utils';
@@ -29,6 +30,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     const menuItems = [
         { name: 'Dashboard', icon: LayoutDashboard, path: '/admin' },
         { name: 'Products', icon: Package, path: '/admin/products' },
+        { name: 'Collections', icon: LayoutGrid, path: '/admin/categories' },
         { name: 'Inquiries', icon: MessageSquare, path: '/admin/inquiries' },
         { name: 'Settings', icon: Settings, path: '/admin/settings' },
     ];
