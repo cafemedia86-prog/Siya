@@ -9,6 +9,7 @@ import { useCart } from '../context/CartContext';
 import { useAdmin } from '../context/AdminContext';
 import { useTranslation } from 'react-i18next';
 import { Languages } from 'lucide-react';
+import logoImg from '../assets/logo.png';
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -56,13 +57,12 @@ export const Navbar = () => {
         )}
       >
         <Link to="/" className="flex items-center gap-2 group" aria-label="Siya's Home">
-          <motion.span
+          <motion.div
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
-            className="text-3xl font-serif font-bold tracking-tight text-brand-olive group-hover:text-brand-terracotta transition-colors"
           >
-            Siya's
-          </motion.span>
+            <img src={logoImg} alt="Siya's" className="h-10 w-auto" />
+          </motion.div>
         </Link>
 
         {/* Desktop Nav */}

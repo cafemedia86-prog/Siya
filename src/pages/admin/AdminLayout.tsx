@@ -17,6 +17,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { cn } from '../../lib/utils';
 import { AnimatePresence } from 'motion/react';
 import { useAuth } from '../../context/AuthContext';
+import logoImg from '../../assets/logo.png';
 
 interface AdminLayoutProps {
     children: React.ReactNode;
@@ -79,8 +80,9 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                 isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
             )}>
                 <div className="p-10 flex items-center justify-between">
-                    <Link to="/" className="text-2xl font-serif font-bold tracking-tight text-[#D47A6A] hover:opacity-80 transition-opacity">
-                        Siya's Admin
+                    <Link to="/" className="flex items-center gap-3" aria-label="Siya's Home">
+                        <img src={logoImg} alt="Siya's" className="h-9 w-auto" />
+                        <span className="text-xs font-bold uppercase tracking-widest text-[#D47A6A]">Admin</span>
                     </Link>
                     <button
                         onClick={() => setIsMobileMenuOpen(false)}

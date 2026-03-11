@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Instagram, Facebook, Twitter, Linkedin } from 'lucide-react';
+import logoImg from '../assets/logo.png';
 
 export const Footer = () => {
   return (
@@ -8,7 +9,9 @@ export const Footer = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           <div className="space-y-4">
-            <Link to="/" className="text-2xl font-serif font-bold tracking-tight text-white" aria-label="Siya's Home">Siya's</Link>
+            <Link to="/" className="inline-block" aria-label="Siya's Home">
+              <img src={logoImg} alt="Siya's" className="h-10 w-auto rounded-lg" />
+            </Link>
             <p className="text-white/60 text-xs leading-relaxed max-w-xs">
               Premium B2B supplier of the world's finest spices, dry fruits, and teas. Committed to quality, sustainability, and authentic flavor.
             </p>
